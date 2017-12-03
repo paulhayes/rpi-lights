@@ -1,0 +1,15 @@
+{
+  "name": "lights",
+  "version": "1.0.0",
+  "main": "lights.js",
+  "dependencies": {
+    "rpi-ws281x-native": "github:paulhayes/node-rpi-ws281x-native#v1.x"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

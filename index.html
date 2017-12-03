@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Lights</title>
+
+</head>
+<body>
+
+</body>
+  <div id="container"></div>
+  <script>
+	var container = document.getElementById("container");
+	var selectNode = document.createElement("select");
+	
+	container.appendChild(selectNode);
+
+	var xhttp = new XMLHttpRequest();
+  	xhttp.onreadystatechange = function() {
+	    if (this.readyState == 4 && this.status == 200) {
+	    	var options = JSON.parse(this.responseText);
+	    	options.forEach(function(option, index){
+		     	var op = new Option();
+				op.value = index;
+				op.text = option.name;
+				selectNode.options.add(op);
+	    	});
+			selectNode.onchange = function(event){
+				console.log(event.target.value);
+				var xhttp = new XMLHttpRequest();
+				xhttp.open("GET", "/select?"+encodeQueryData({option:event.target.value}), true);
+  				xhttp.send();
+			}
+	    }
+	  };
+  xhttp.open("GET", "/options", true);
+  xhttp.send();
+
+  function encodeQueryData(data) {
+   let ret = [];
+   for (let d in data)
+     ret.push(encodeURIComponent(d) + '=' + encodeURIComponent(data[d]));
+   return ret.join('&');
+}
+
+  </script>
+</html>
