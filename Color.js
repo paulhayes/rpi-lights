@@ -62,6 +62,7 @@ let Color = exports.Color = class {
 	}
 
 	static lerp(color1,color2,t){
+		t=Math.min(1,Math.max(0,t));
 		return color1.mul(1-t).add( color2.mul(t) );
 	}
 
