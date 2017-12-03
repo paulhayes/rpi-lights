@@ -84,9 +84,9 @@ function parseOption(obj,res){
   res.setHeader('Content-Type', 'application/json');
   res.end( JSON.stringify({status:'okay'}) );
   console.log(obj);
-  if( obj.option ){
+  if( 'option' in obj ){
     let effectIndex = parseInt(obj.option,10);
-    if( effectIndex > 0 && effectIndex < effects.length ){
+    if( effectIndex >= 0 && effectIndex < effects.length ){
       currentEffect = effects[effectIndex];
     }
   }
