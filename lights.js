@@ -35,11 +35,13 @@ let inc = 0;
 
 var effects = [
   new Plain(),
-  new Plain("Low white",0,0,0,0.7),
-  new Plain("Bright white",0,0,0,1),
+  new Plain("low white",0,0,0,0.7),
+  new Plain("bright white",0,0,0,1),
   new Plain("red",1,0,0,0),
   new Plain("green",0,1,0,0),
   new Plain("blue",0,0,1,0),
+  new Plain("low yellow",0.2,0.15,0,0),
+  new Plain("bright yellow",1,0.5,0,0),
   new Fire()
 ];
 var currentEffect;

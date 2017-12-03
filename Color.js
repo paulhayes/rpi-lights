@@ -61,6 +61,10 @@ let Color = exports.Color = class {
 		return new Color(pow(this.r,1.5),pow(this.g,1.5),pow(this.b,1.5),pow(this.w,1.5));
 	}
 
+	static lerp(color1,color2,t){
+		return color1.mul(1-t).add( color2.mul(t) );
+	}
+
 	static toIntArray(colorArray, intArray){
 		for(let i=0;i<colorArray.length;i++){
 			intArray[i] = colorArray[i].toInt();
