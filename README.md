@@ -10,14 +10,16 @@ Control of NeoPixel like strip from web browser.
 ### LEDS
 I used 144 per meter density LEDs. Although any density will work. 
 
-Typical power usage
-Situation: The raspberry pi with lights off 
-Current: 260mA | 2440ma
-Power: 1.3W
+
+| Situation | Current | Power |
+|-----------|---------|--------|
+| The raspberry pi with lights off | 260mA | 1.3W |
+| Full white LED | 2700ma | 13.5W |
+| Half white LED | 1700ma | 8.5W |
 
 
-Full white LED consumes 2440mA per meter.
-Half white LED 
+
+
 
 
 ### Config
