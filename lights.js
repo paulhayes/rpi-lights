@@ -11,7 +11,7 @@ const Wave = require('./effects/wave');
 const Scroll = require('./effects/scroll');
 const Color = require('./Color');
 const Random = require('./patterns/Random');
-
+const settingsPath = '/boot/light-settings.json';
 const NUM_LEDS = 288;
 const STRIP_TYPE = "sk6812-grbw";
 
@@ -101,7 +101,7 @@ function parseOption(obj,res){
   if( 'option' in obj ){
     let effectIndex = parseInt(obj.option,10);
     selectEffect(effectIndex);
-    fs.writeFile("settings.json",JSON.stringify({effectIndex:effectIndex}));
+    fs.writeFile(settingsPath,JSON.stringify({effectIndex:effectIndex}));
   }
 }
 
@@ -137,7 +137,7 @@ server.listen(80, "0.0.0.0", () => {
   console.log("Server running");
 });
 
-fs.readFile("settings.json", (e,data)=>{
+fs.readFile(settingsPath, (e,data)=>{
   if(!e){
     selectEffect( JSON.parse(data).effectIndex);
   }
