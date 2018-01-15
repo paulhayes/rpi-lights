@@ -27,3 +27,10 @@ I used 144 per meter density LEDs. Although any density will work.
 
 ### Config
 
+
+### Startup on Boot
+Add the following line before ```exit(0)``` in ```/etc/rc.local```
+
+```bash
+node /home/pi/workspace/lights/lights.js < /dev/null &
+```
