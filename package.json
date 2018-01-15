@@ -11,5 +11,9 @@
   },
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "nodemonConfig": {
+    "ignore": ["test/*", "docs/*", "settings.json"],
+    "delay": "1000"
+  }
 }

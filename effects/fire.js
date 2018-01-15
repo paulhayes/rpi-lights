@@ -1,18 +1,19 @@
 "use strict";
 
-const Color = require('../Color').Color;
+const Color = require('../Color');
 
 let randomRange = function(start,end){
 	return Math.floor( start + (Math.random() * (end-start)) );
 }
 
-exports.Fire = class {
+module.exports = class {
 
-	constructor(){
+	constructor(name, warmColor,coldColor){
 		this.numPixels;
-		this.name = "Fire";
+		this.name = name || "Fire";
 
-		
+		this.coldColor = coldColor || new Color(0.3,0,0,0.01);
+		this.warmColor = warmColor || new Color(1,0.4,0,0);
 	}
 
 	init(num){
@@ -21,8 +22,7 @@ exports.Fire = class {
 		this.lastColors = new Float32Array(this.numPixels);
 		this.tempColors = new Float32Array(this.numPixels);
 
-		this.coldColor = new Color(0.3,0,0,0.01);
-		this.warmColor = new Color(1,0.4,0,0);
+		
 	}
 
 	update(pixels){
@@ -56,7 +56,7 @@ exports.Fire = class {
 		}
 
 
-		Color.toIntArray(Array.from(this.currentColors,c=>this.warmColor.mul(c).add(this.coldColor).gamma(1.5) ), pixels);
+		Color.toIntArray(Array.from(this.currentColors,c=>this.warmColor.mul(c).add(this.coldColor) ), pixels);
 	}
 
  	wrap(index){

@@ -1,18 +1,19 @@
+'use strict';
+
 let toByte = function(channel){
 	return Math.floor(0xff*Math.min(1,Math.max(channel,0))) & 0xff;
 }
 
-let Color = exports.Color = class {
+let Color = module.exports = class {
 
 	constructor(r,g,b,w){
-
-
-		
-
 		this.r = r || 0;
 		this.g = g || 0;
 		this.b = b || 0;
 		this.w = w || 0;
+
+		//This is meant to be an immutable class right?
+		Object.freeze(this);
 	}
 
 	mul(color){
@@ -53,7 +54,8 @@ let Color = exports.Color = class {
 	}
 
 	toInt(){
-		return toByte(this.w)<<24 | toByte(this.r)<<16 | toByte(this.g)<<8 | toByte(this.b);
+		var col = this.gamma(1.5);
+		return toByte(col.w)<<24 | toByte(col.r)<<16 | toByte(col.g)<<8 | toByte(col.b);
 	}
 
 	gamma(value){
@@ -72,4 +74,10 @@ let Color = exports.Color = class {
 		}
 	}
 
+	static random(minColor,maxColor){
+		return minColor.add( maxColor.subtract(minColor).mul( new Color(Math.random(),Math.random(),Math.random(),Math.random()) ) );
+	}
+
 }
+
+Color.black = new Color(0,0,0,0);

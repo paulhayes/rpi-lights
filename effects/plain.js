@@ -1,10 +1,10 @@
 "use strict";
 
-const Color = require('../Color').Color;
+const Color = require('../Color');
 
 //const color = new Color(0,0,0,200);
 
-exports.Plain = class {
+module.exports = class {
 	
 	constructor(name, r,g,b,w){
 		this.numPixels;

@@ -3,12 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
+  <link rel="icon" type="image/png" href="/favicon.png" />
   <title>Lights</title>
-
 </head>
 <body>
-
-</body>
   <div id="container"></div>
   <script>
 	var container = document.getElementById("container");
@@ -19,13 +17,15 @@
 	var xhttp = new XMLHttpRequest();
   	xhttp.onreadystatechange = function() {
 	    if (this.readyState == 4 && this.status == 200) {
-	    	var options = JSON.parse(this.responseText);
+	    	var data = JSON.parse(this.responseText);
+	    	var options = data.effects;
 	    	options.forEach(function(option, index){
 		     	var op = new Option();
 				op.value = index;
-				op.text = option.name;
+				op.text = option;
 				selectNode.options.add(op);
 	    	});
+	    	selectNode.value = data.selected;
 			selectNode.onchange = function(event){
 				console.log(event.target.value);
 				var xhttp = new XMLHttpRequest();
@@ -45,4 +45,5 @@
 }
 
   </script>
+</body>
 </html>
