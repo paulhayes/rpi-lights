@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: a38eb5da26d9440dfbced44c9998a037
+timeCreated: 1516131278
+licenseType: Pro
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Share-TechMono
+  fontNames:
+  - Share-TechMono
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 83dcca166fd434727aa6046e36ab0f7e, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
