@@ -30,7 +30,8 @@ Create an SD card with the latest raspbian image.
 - Create lights user: ```adduser lights```
 - Add lights user to sudoers group: ```sudo usermod -aG sudo <username>```
 - Copy your rsa public key file: ```ssh-copy-id pi@raspberrypi.local``` 
-
+- Install git: ```apt-get install git```
+- Install node js, instructions here: https://github.com/sdesalas/node-pi-zero
 ### Setup
 
 Modify the /etc/hostname to something ending with lights.
