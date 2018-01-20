@@ -23,7 +23,14 @@ I used 144 per meter density LEDs. Although any density will work.
 
 
 
+### Setup
 
+Modify the /etc/hostname to something ending with lights.
+```
+office-lights
+```
+
+The mDns service should then find the lights by search for *-lights.local
 
 ### Config
 
