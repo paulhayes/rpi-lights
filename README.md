@@ -33,6 +33,8 @@ Create an SD card with the latest raspbian image.
 - Install git: ```apt-get install git```
 - Install node js, instructions here: https://github.com/sdesalas/node-pi-zero
 - Clone this repo: ```git clone git@github.com:paulhayes/rpi-lights.git```
+- Copy config.txt to boot ```cp config.txt /boot/config.txt```
+
 ### Setup
 
 Modify the /etc/hostname to something ending with lights.
