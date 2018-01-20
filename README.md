@@ -26,8 +26,8 @@ Create an SD card with the latest raspbian image.
 
 - Add an empty file call ```ssh``` to the boot partition
 - Add a ```wpa_supplicant.conf``` to boot partition.
-- Use passwd to change default user password
-- Create lights user ```adduser lights```
+- change default user password: ```passwd```
+- Create lights user: ```adduser lights```
 - Add lights user to sudoers group: ```sudo usermod -aG sudo <username>```
 - Copy your rsa public key file: ```ssh-copy-id pi@raspberrypi.local``` 
 
