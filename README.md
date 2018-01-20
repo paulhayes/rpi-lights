@@ -32,6 +32,7 @@ Create an SD card with the latest raspbian image.
 - Copy your rsa public key file: ```ssh-copy-id pi@raspberrypi.local``` 
 - Install git: ```apt-get install git```
 - Install node js, instructions here: https://github.com/sdesalas/node-pi-zero
+- Clone this repo: ```git clone git@github.com:paulhayes/rpi-lights.git```
 ### Setup
 
 Modify the /etc/hostname to something ending with lights.
@@ -47,5 +48,5 @@ The mDns service should then find the lights by search for *-lights.local
 Add the following line before ```exit(0)``` in ```/etc/rc.local```
 
 ```bash
-node /home/lights/workspace/lights/lights.js < /dev/null &
+node /home/lights/workspace/rpi-lights/lights.js < /dev/null &
 ```
