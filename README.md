@@ -40,7 +40,7 @@ Modify the /etc/hostname to something ending with lights.
 office-lights
 ```
 
-The mDns service should then find the lights by searching _lights._tcp.local
+The mDns service should then find the lights by searching ```_lights._tcp.local```
 
 ### Config
 
