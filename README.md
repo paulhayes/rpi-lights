@@ -40,7 +40,7 @@ Modify the /etc/hostname to something ending with lights.
 office-lights
 ```
 
-The mDns service should then find the lights by search for *-lights.local
+The mDns service should then find the lights by searching _lights._tcp.local
 
 ### Config
 
@@ -50,3 +50,7 @@ Add the following line before ```exit(0)``` in ```/etc/rc.local```
 ```bash
 node /home/lights/workspace/rpi-lights/lights.js < /dev/null &
 ```
+
+### Make read only
+- Use the following instructions https://github.com/ways/rpi-readonly
+
