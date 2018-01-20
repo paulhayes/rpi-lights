@@ -46,5 +46,5 @@ The mDns service should then find the lights by search for *-lights.local
 Add the following line before ```exit(0)``` in ```/etc/rc.local```
 
 ```bash
-node /home/pi/workspace/lights/lights.js < /dev/null &
+node /home/lights/workspace/lights/lights.js < /dev/null &
 ```
