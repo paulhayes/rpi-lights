@@ -12,7 +12,7 @@ const Scroll = require('./effects/scroll');
 const Color = require('./Color');
 const Random = require('./patterns/Random');
 const settingsPath = '/boot/light-settings.json';
-const NUM_LEDS = 288;
+const NUM_LEDS = 576;
 const STRIP_TYPE = "sk6812-grbw";
 
 const channels = ws281x.init({

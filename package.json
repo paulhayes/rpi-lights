@@ -13,7 +13,11 @@
   "license": "ISC",
   "description": "",
   "nodemonConfig": {
-    "ignore": ["test/*", "docs/*", "settings.json"],
+    "ignore": [
+      "test/*",
+      "docs/*",
+      "settings.json"
+    ],
     "delay": "1000"
   }
 }
