@@ -23,25 +23,47 @@ namespace mDNS {
         internal const int IPLengthOffset = 8;
         internal const int IPAddressOffset = 12; 
 
-        public event System.Action<IPAddress> NameResolvedEvent;
+        public event System.Action<IPAddress,string> NameResolvedEvent;
         public event System.Action<IPAddress,string,int> PacketReceived;
+
+        public HashSet<string> requestNames = new HashSet<string>();
+
+        public enum QueryType : ushort {
+            A = 0x1,
+            PTR = 0x0c
+        }
+
+        UdpClient udpClient;
+
+        public mDNSDiscovery(){
+            IPAddress multicastAddress = IPAddress.Parse(addr);
+            udpClient = new UdpClient(AddressFamily.InterNetwork);
+            udpClient.JoinMulticastGroup(multicastAddress);
+
+            //IPAddress multicastAddress = IPAddress.Parse(address);
+            //var udpClient = new UdpClient(AddressFamily.InterNetwork);
+            udpClient.ExclusiveAddressUse = false;
+            udpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+            udpClient.Client.Bind(new IPEndPoint(IPAddress.Any, port));
+            //udpClient.JoinMulticastGroup(multicastAddress);
+
+            udpClient.BeginReceive(OnReceiveSink,null);
+        }
 
         public class RequestInfo {
             public UdpClient client;
             public string name;
         }
 
-        public void SendRequest(string name)
+        public void SendRequest(string name, QueryType type = QueryType.A)
         {
-            IPAddress multicastAddress = IPAddress.Parse(addr);
-            var udpClient = new UdpClient(port, AddressFamily.InterNetwork);
+            
             //udpClient.ExclusiveAddressUse = false;
 
-            udpClient.JoinMulticastGroup(multicastAddress);
-            IPEndPoint remoteep = new IPEndPoint(multicastAddress, port);
+            IPAddress multicastAddress = IPAddress.Parse(addr);
+            IPEndPoint remoteEP = new IPEndPoint(multicastAddress, port);
 
-
-            mDNSRequest request = new mDNSRequest(name);
+            mDNSRequest request = new mDNSRequest(name, type);
             Debug.Log("Sending request");
 
             byte[] requestBytes = request.ToByteArray();
@@ -52,13 +74,14 @@ namespace mDNS {
                 client = udpClient
             };
 
-            udpClient.BeginSend(requestBytes, requestBytes.Length, remoteep, ReceiveAsync, requestInfo);
+            requestNames.Add(name);
+            udpClient.BeginSend(requestBytes, requestBytes.Length, remoteEP, ReceiveAsync, requestInfo);
         }
 
         private void ReceiveAsync(IAsyncResult result)
         {
             RequestInfo requestInfo = result.AsyncState as RequestInfo;
-            requestInfo.client.EndSend(result);
+            //requestInfo.client.EndSend(result);
             Debug.Log("Waiting for receive");
             string address = addr;
             //var host = Dns.GetHostEntry(Dns.GetHostName()); host.AddressList;
@@ -70,31 +93,24 @@ namespace mDNS {
             }
 
             */
-            IPAddress multicastAddress = IPAddress.Parse(address);
-            var udpClient = new UdpClient(AddressFamily.InterNetwork);
-            //udpClient.ExclusiveAddressUse = false;
-            udpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            udpClient.Client.Bind(new IPEndPoint(IPAddress.Any, port));
-            udpClient.JoinMulticastGroup(multicastAddress);
 
-            requestInfo.client = udpClient;
-
-            udpClient.BeginReceive(OnReceiveSink,requestInfo);
         }
 
         private void OnReceiveSink(IAsyncResult result)
         {
             
-
+            Debug.Log("OnReceiveSink");
             IPEndPoint ep = null;
-            RequestInfo requestInfo = result.AsyncState as RequestInfo;
-            var session = requestInfo.client;
+            var session = udpClient;
             //var local = (IPEndPoint) args[1];
 
             byte[] buffer = session.EndReceive(result, ref ep);
             string dataStr = ByteArrayToString(buffer);
             //Do what you want here with the data of the buffer
-            PacketReceived.Invoke(ep.Address, dataStr, buffer.Length);
+
+            UnityMainThreadDispatcher.Instance().Enqueue( ()=>{
+                PacketReceived.Invoke(ep.Address, dataStr, buffer.Length);
+            } );
 
             Debug.Log("Message received from " + ep + "  length="+buffer.Length);
             Debug.Log( dataStr );
@@ -107,14 +123,22 @@ namespace mDNS {
                 response.FromByteArray(buffer);
                 Debug.Log(response.name +" "+response.address.ToString());
                 Debug.LogFormat( ">>>> {1} : {0}",response.address, response.name );
-                if(NameResolvedEvent != null) 
-                    NameResolvedEvent.Invoke(response.address);
+
+                if(NameResolvedEvent != null && requestNames.Contains(response.name)) {
+                    UnityMainThreadDispatcher.Instance().Enqueue( ()=>{
+                        NameResolvedEvent.Invoke(response.address,response.name);
+                    });
+                }
             }
 
             //We make the next call to the begin receive
             //session.BeginReceive(OnReceiveSink, args);
-            session.Close();
+            udpClient.BeginReceive(OnReceiveSink,null);
 
+        }
+
+        private void Close(){
+            udpClient.Close();
         }
 
         public static string ByteArrayToString(byte[] ba)
@@ -169,13 +193,16 @@ namespace mDNS {
 
     class mDNSRequest {
         private string name;
+        mDNSDiscovery.QueryType type;
 
-        public mDNSRequest(string name){
+        public mDNSRequest(string name, mDNSDiscovery.QueryType type){
             this.name = name;
+            this.type = type;
         }
 
         public byte[] ToByteArray()
         {
+
             string[] nameParts = name.Split('.');
             var stream = new MemoryStream();
             stream.WriteByte(0);
@@ -194,13 +221,11 @@ namespace mDNS {
             stream.WriteByte(0);
             stream.WriteByte(0);
 
-            byte[] part0 = Encoding.ASCII.GetBytes( nameParts[0] );
-            byte[] part1 = Encoding.ASCII.GetBytes( nameParts[1] );
-
-            stream.WriteByte( (byte)nameParts[0].Length );
-            stream.Write( part0, 0, part0.Length );
-            stream.WriteByte( (byte)nameParts[1].Length );
-            stream.Write( part1, 0, part1.Length );
+            for(int i=0;i<nameParts.Length;i++){
+                byte[] part = Encoding.ASCII.GetBytes( nameParts[i] );
+                stream.WriteByte( (byte)nameParts[i].Length );
+                stream.Write( part, 0, part.Length );
+            }
 
             stream.WriteByte(0);
 

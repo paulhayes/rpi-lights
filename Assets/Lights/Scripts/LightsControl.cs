@@ -55,7 +55,7 @@ public class LightsControl : MonoBehaviour
         }   
 	}
 
-    void OnIpAddress(IPAddress addr){
+    void OnIpAddress(IPAddress addr, string name){
         Debug.LogFormat("OnIpAddress {0}",addr);
         address = addr;
     }

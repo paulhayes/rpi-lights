@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
 
 public class FindSever : MonoBehaviour {
 
@@ -16,18 +17,32 @@ public class FindSever : MonoBehaviour {
     Button resolveBtn;
     [SerializeField]
     Text debugField;
+    [SerializeField]
+    Dropdown typeField;
+
+    string[] names;
+    System.Array values;
+
+    mDNS.mDNSDiscovery discovery;
 
 	// Use this for initialization
 	void Start () {
         inputField.text = name;
-        var discovery = new mDNS.mDNSDiscovery();
-        discovery.NameResolvedEvent += OnNameResolved;
+        discovery = new mDNS.mDNSDiscovery();
+
         discovery.PacketReceived += OnPacketReceived;
         resolveBtn.onClick.AddListener( ()=>{
             name = inputField.text.Trim();
-            discovery.SendRequest(name);
-
+            var type = (mDNS.mDNSDiscovery.QueryType)values.GetValue( typeField.value );
+            Debug.LogFormat("type={0}",type);
+            discovery.SendRequest(name, type);
+            discovery.NameResolvedEvent += OnNameResolved;
         });
+
+        names = System.Enum.GetNames( typeof( mDNS.mDNSDiscovery.QueryType ) );
+        values = System.Enum.GetValues( typeof( mDNS.mDNSDiscovery.QueryType ) );
+        typeField.AddOptions( names.ToList() );
+
 	}
 	
 	// Update is called once per frame
@@ -38,7 +53,11 @@ public class FindSever : MonoBehaviour {
         }   
 	}
 
-    void OnNameResolved(System.Net.IPAddress address){
+    void OnNameResolved(System.Net.IPAddress address, string name){
+        if( this.name != name ){
+            return;
+        }        
+        discovery.NameResolvedEvent -= OnNameResolved;
         Debug.Log(address);
         outputField.text += string.Format("ip:{0}\n",address);
     }
