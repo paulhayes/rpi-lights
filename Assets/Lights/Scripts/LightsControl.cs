@@ -11,18 +11,33 @@ public class LightsControl : MonoBehaviour
     [SerializeField]
     Dropdown optionsDropdown;
 
+    [SerializeField]
+    Dropdown deviceDropdown;
+
     IPAddress address;
-    public string name = "raspberrypi.local";
+
+    [SerializeField]
+    string deviceName = "raspberrypi.local";
+    [SerializeField]
+    mDNS.mDNSDiscovery.QueryType type;
     public string[] effects;
     public int selected;
 
-	IEnumerator Start () 
+    List<IPAddress> matchedAddresses;
+
+	void Start () 
     {
+        matchedAddresses = new List<IPAddress>();
         var discovery = new mDNS.mDNSDiscovery();
         discovery.NameResolvedEvent += OnIpAddress;
-        discovery.SendRequest(name);
-        yield return new WaitUntil(()=>address != null);
-
+        discovery.SendRequest(deviceName, type);
+        deviceDropdown.ClearOptions();
+        deviceDropdown.onValueChanged.AddListener(  OnDeviceChanged );
+        
+	}
+	
+    IEnumerator UpdatePatternList(){
+        Debug.Log("refresahing pattern list");
         string url = string.Format("http://{0}/options",address.ToString());
         Debug.Log(url);
         using (UnityWebRequest www = UnityWebRequest.Get(url))
@@ -45,8 +60,8 @@ public class LightsControl : MonoBehaviour
                 optionsDropdown.onValueChanged.AddListener(OnSelectionChange);
             }
         }
-	}
-	
+    }
+
 	void Update () 
     {
         if( Input.GetKeyDown( KeyCode.Escape ) )
@@ -57,7 +72,22 @@ public class LightsControl : MonoBehaviour
 
     void OnIpAddress(IPAddress addr, string name){
         Debug.LogFormat("OnIpAddress {0}",addr);
-        address = addr;
+        bool isFirstAddress = ( address == null );
+        
+        if(isFirstAddress){
+            address = addr;
+            StartCoroutine( UpdatePatternList() );
+        }
+        
+        matchedAddresses.Add( addr );
+        deviceDropdown.AddOptions( new List<string>(){ name } );
+
+     
+    }
+
+    void OnDeviceChanged(int deviceIndex){
+        address = matchedAddresses[deviceIndex];
+        StartCoroutine( UpdatePatternList() );
     }
 
     void OnSelectionChange(int value){
