@@ -6,6 +6,7 @@ const fileSystem = require('fs');
 const path = require('path');
 const url = require('url');
 const Plain = require('./effects/plain');
+const Movement = require('./effects/movement');
 const Fire = require('./effects/fire');
 const Wave = require('./effects/wave');
 const Scroll = require('./effects/scroll');
@@ -33,6 +34,13 @@ process.on('SIGINT', function() {
   });
 });
 
+/*
+process.once('SIGUSR2', function () {
+    ws281x.reset();
+    process.kill(process.pid, 'SIGUSR2');
+});
+*/
+
 // ---- animation-loop
 let offset = 0;
 let inc = 0;
@@ -47,6 +55,7 @@ var effects = [
   new Plain("blue",0,0,1,0),
   new Plain("low yellow",0.2,0.15,0,0),
   new Plain("bright yellow",1,0.5,0,0),
+  new Movement("movement",60,new Plain("low white",0,0,0,0.7)),
   new Fire(),
   new Fire("Blue fire",new Color(0,0,0.8,0.2),new Color(0,0,0.2,0)),
   new Scroll("Random Scroll", new Random(NUM_LEDS,new Color(0,0,0,0),new Color(0,0,1,0.8)), 20),
