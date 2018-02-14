@@ -1,5 +1,5 @@
 # Raspberry Pi Lights
-Control of NeoPixel like strip from web browser.
+Control of NeoPixel like strip from web browser and mobile app.
 
 ### Hardware
 
