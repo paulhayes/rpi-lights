@@ -20,6 +20,8 @@ I used 144 per meter density LEDs. Although any density will work.
 | Full Green per meter | 1220ma | 6.1W |
 | Full Blue per meter | 1230ma | 6.15W |
 
+**Power per meter for 144 density strips*
+
 ### Setting up Raspberry Pi
 
 Create an SD card with the latest raspbian image.
