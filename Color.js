@@ -53,14 +53,39 @@ let Color = module.exports = class {
 		}	
 	}
 
+	crunch(white){
+		let min = Math.min(this.r,this.g,this.b);
+		let r = white * this.r;
+		let g = white * this.g;
+		let b = white * this.b;
+		let w = 0;
+		if( min > white ){
+			w = (min-white)/(1-white);
+		}
+		return new Color(r,g,b,w);
+	}
+
 	toInt(){
-		var col = this.gamma(1.5);
+		var col = this.balance(1,0.725,0.7,1).gamma(1.5);
 		return toByte(col.w)<<24 | toByte(col.r)<<16 | toByte(col.g)<<8 | toByte(col.b);
 	}
 
-	gamma(value){
+	balance(vr,vg,vb,vw){
+		vr = vr || 1;
+		vg = vg || vr;
+		vb = vb || vg;
+		vw = vw || vb;
+		return new Color((this.r*vr),(this.g*vg),(this.b*vb),(this.w*vw));
+		
+	}
+
+	gamma(vr,vg,vb,vw){
+		vr = vr || 1.5;
+		vg = vg || vr;
+		vb = vb || vg;
+		vw = vw || vb;
 		let pow = Math.pow;
-		return new Color(pow(this.r,1.5),pow(this.g,1.5),pow(this.b,1.5),pow(this.w,1.5));
+		return new Color(pow(this.r,vr),pow(this.g,vg),pow(this.b,vb),pow(this.w,vw));
 	}
 
 	static lerp(color1,color2,t){
@@ -76,6 +101,13 @@ let Color = module.exports = class {
 
 	static random(minColor,maxColor){
 		return minColor.add( maxColor.subtract(minColor).mul( new Color(Math.random(),Math.random(),Math.random(),Math.random()) ) );
+	}
+
+	static fromPixelBuffer(buffer,offset){
+		let r = buffer.data[offset+0];
+		let g = buffer.data[offset+1];
+		let b = buffer.data[offset+2];
+		return new Color(r/255,g/255,b/255,0);
 	}
 
 }

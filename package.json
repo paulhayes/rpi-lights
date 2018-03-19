@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "lights.js",
   "dependencies": {
-    "onoff": "^1.1.9",
+    "onoff": "^1.2.0",
     "parse-png": "^1.1.2",
     "rpi-ws281x-native": "github:paulhayes/node-rpi-ws281x-native#v1.x"
   },

@@ -6,6 +6,9 @@ const fileSystem = require('fs');
 const path = require('path');
 const url = require('url');
 const Plain = require('./effects/plain');
+const ColorTest = require('./effects/colorTest.js');
+const GammaTest = require('./effects/gammaTest.js');
+const Daylight = require('./effects/daylight');
 const Movement = require('./effects/movement');
 const Fire = require('./effects/fire');
 const Wave = require('./effects/wave');
@@ -49,7 +52,8 @@ let inc = 0;
 
 var effects = [
   new Plain(),
-  new Daylight( 'Daylight', path.join(__dirname, "img/horizonOverTime.png"), "4:43", "21:21" ),
+  new Daylight( 'Daylight', path.join(__dirname, "img/horizonOverTime.png"), "4:43", "21:21", 10 ),
+  new Daylight( 'Daylight test', path.join(__dirname, "img/horizonOverTime.png"), "21:42", "21:43", 0.1 ),
   new Chase('Chase Yellow/Red', new Color(0.4,0.2,0,0),new Color(1,0.1,0.1,0), new Color(0,0,0,0), 3, 50, 40),
   new Plain("low white",0,0,0,0.7),
   new Plain("bright white",0,0,0,1),
@@ -65,6 +69,11 @@ var effects = [
   new Scroll("Random Scroll", new Random(NUM_LEDS,new Color(0,0,0,0),new Color(0,0,1,0.8)), 20),
   new Scroll("Random Scroll", new Random(NUM_LEDS,new Color(0,0,0,0),new Color(1,0,1,0)), 20),
   new Wave("Orange wave",new Color(0,0,0,0),new Color(1,0.5,0,0), 1, 1)
+  new ColorTest(),
+  new GammaTest(),
+  new GammaTest("gamma 1/4 ",1,4),
+  new GammaTest("gamme 3/4 ",3,4),
+  new GammaTest("full ",4,4),
 ];
 var currentEffect;
 
@@ -151,7 +160,11 @@ server.listen(80, "0.0.0.0", () => {
 });
 
 fs.readFile(settingsPath, (e,data)=>{
-  if(!e){
-    selectEffect( JSON.parse(data).effectIndex);
-  }
+    try {
+      selectEffect( JSON.parse(data).effectIndex);
+    }
+    catch(e){
+      console.warn("Error reading JSON settings file");
+    }
+
 })
