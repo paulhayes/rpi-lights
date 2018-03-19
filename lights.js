@@ -68,12 +68,12 @@ var effects = [
   new Fire("Blue fire",new Color(0,0,0.8,0.2),new Color(0,0,0.2,0)),
   new Scroll("Random Scroll", new Random(NUM_LEDS,new Color(0,0,0,0),new Color(0,0,1,0.8)), 20),
   new Scroll("Random Scroll", new Random(NUM_LEDS,new Color(0,0,0,0),new Color(1,0,1,0)), 20),
-  new Wave("Orange wave",new Color(0,0,0,0),new Color(1,0.5,0,0), 1, 1)
+  new Wave("Orange wave",new Color(0,0,0,0),new Color(1,0.5,0,0), 1, 1),
   new ColorTest(),
   new GammaTest(),
   new GammaTest("gamma 1/4 ",1,4),
   new GammaTest("gamme 3/4 ",3,4),
-  new GammaTest("full ",4,4),
+  new GammaTest("full ",4,4)
 ];
 var currentEffect;
 
