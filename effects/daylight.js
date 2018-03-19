@@ -46,7 +46,8 @@ module.exports = class {
 		t=((t%1)+1)%1;
 		if( t < 0 ) t = 0;
 		if( t > 1 ) t = 1;
-		let y = Math.floor( (this.image.height-1) * t );
+		let yFloat = (this.image.height-1) * t;
+		let y = Math.floor( yFloat );
 		//console.log(y,t);
 		for(let index=0;index<this.numPixels;index++){
 			let x = Math.floor( this.image.width * index/(this.numPixels-1) );
@@ -62,7 +63,7 @@ module.exports = class {
 			let c1 = Color.fromPixelBuffer(this.image,i);
 			let c2 = Color.fromPixelBuffer(this.image,i2);
 			
-			this.colors[index] = Color.lerp(c1,c2,0.5).crunch(0.9);
+			this.colors[index] = Color.lerp(c1,c2,yFloat-y).crunch(0.9);
 		}
 	}
 	
