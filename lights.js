@@ -9,6 +9,7 @@ const Plain = require('./effects/plain');
 const Movement = require('./effects/movement');
 const Fire = require('./effects/fire');
 const Wave = require('./effects/wave');
+const Chase = require('./effects/chase.js');
 const Scroll = require('./effects/scroll');
 const Color = require('./Color');
 const Random = require('./patterns/Random');
@@ -48,6 +49,8 @@ let inc = 0;
 
 var effects = [
   new Plain(),
+  new Daylight( 'Daylight', path.join(__dirname, "img/horizonOverTime.png"), "4:43", "21:21" ),
+  new Chase('Chase Yellow/Red', new Color(0.4,0.2,0,0),new Color(1,0.1,0.1,0), new Color(0,0,0,0), 3, 50, 40),
   new Plain("low white",0,0,0,0.7),
   new Plain("bright white",0,0,0,1),
   new Plain("red",1,0,0,0),
@@ -56,11 +59,12 @@ var effects = [
   new Plain("low yellow",0.2,0.15,0,0),
   new Plain("bright yellow",1,0.5,0,0),
   new Movement("movement",60,new Plain("low white",0,0,0,0.7)),
+  new Movement("movement",60,new Plain("low white",0,0,0,0.7)),
   new Fire(),
   new Fire("Blue fire",new Color(0,0,0.8,0.2),new Color(0,0,0.2,0)),
   new Scroll("Random Scroll", new Random(NUM_LEDS,new Color(0,0,0,0),new Color(0,0,1,0.8)), 20),
   new Scroll("Random Scroll", new Random(NUM_LEDS,new Color(0,0,0,0),new Color(1,0,1,0)), 20),
-  new Wave("Orange wave",new Color(0,0,0,0),new Color(1,0.5,0,0), 1, 1),
+  new Wave("Orange wave",new Color(0,0,0,0),new Color(1,0.5,0,0), 1, 1)
 ];
 var currentEffect;
 
@@ -79,7 +83,7 @@ setInterval(function() {
   ws281x.render();
 
   inc++;
-}, 1000 / 30);
+}, 30);
 
 console.log('Press <ctrl>+C to exit.');
 

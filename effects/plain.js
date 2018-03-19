@@ -9,7 +9,12 @@ module.exports = class {
 	constructor(name, r,g,b,w){
 		this.numPixels;
 		this.colors;
-		this.color = new Color(r,g,b,w);
+		if( r instanceof Color ){
+			this.color = r;
+		}
+		else {
+			this.color = new Color(r,g,b,w);
+		}
 		this.name = name || "Off";
 	}
 
