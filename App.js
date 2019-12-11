@@ -1,11 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
-
 import React from 'react';
 import {
   SafeAreaView,
@@ -14,6 +6,7 @@ import {
   View,
   Text,
   StatusBar,
+  FlatList
 } from 'react-native';
 
 import {
@@ -24,91 +17,123 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
-const App: () => React$Node = () => {
-  return (
-    <>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
-          <Header />
-          {global.HermesInternal == null ? null : (
-            <View style={styles.engine}>
-              <Text style={styles.footer}>Engine: Hermes</Text>
-            </View>
-          )}
-          <View style={styles.body}>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Step One</Text>
-              <Text style={styles.sectionDescription}>
-                Edit <Text style={styles.highlight}>App.js</Text> to change this
-                screen and then come back to see your edits.
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>See Your Changes</Text>
-              <Text style={styles.sectionDescription}>
-                <ReloadInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Debug</Text>
-              <Text style={styles.sectionDescription}>
-                <DebugInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Learn More</Text>
-              <Text style={styles.sectionDescription}>
-                Read the docs to discover what to do next:
-              </Text>
-            </View>
-            <LearnMoreLinks />
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    </>
-  );
+import { ThemeContext, getTheme, Button, Toolbar } from 'react-native-material-ui';
+import { getStatusBarHeight } from 'react-native-status-bar-height';
+
+
+const rpi_light_address = "192.168.5.68";
+let options = [];
+
+const uiTheme = {
+  palette: {
+  },
+  statusBar: {
+    height: StatusBar.currentHeight
+  },
+  toolbar: {
+    container: {
+      height: 50,
+    },
+  },
 };
 
 const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: Colors.lighter,
+  container: {
+    flex: 1,
+    flexDirection:'column',
+    paddingTop: StatusBar.currentHeight,
+    backgroundColor: '#ecf0f1',
   },
-  engine: {
-    position: 'absolute',
-    right: 0,
-  },
-  body: {
-    backgroundColor: Colors.white,
-  },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
-  },
-  sectionDescription: {
-    marginTop: 8,
+  paragraph: {
+    margin: 24,
     fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-  footer: {
-    color: Colors.dark,
-    fontSize: 12,
-    fontWeight: '600',
-    padding: 4,
-    paddingRight: 12,
-    textAlign: 'right',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#34495e',
   },
 });
 
-export default App;
+export default class Main extends React.Component {
+  constructor(props){
+    super(props);
+    this.state = {options:[
+    ]};
+    var main = this;
+    //this.setState({appState: state});
+    var xhttp = new XMLHttpRequest();
+  	xhttp.onreadystatechange = function() {
+      console.log( this.status );
+	    if (this.readyState == 4 && this.status == 200) {
+	    	var data = JSON.parse(this.responseText);
+        console.log(main.state);
+        main.state.options = data.effects.map((item,index)=>{
+          return { title:item,  key:index.toString() };
+        });
+        main.setState(main.state);
+        
+        console.log('options',data.effects);
+	    }
+	  };
+    xhttp.open("GET", "http://"+rpi_light_address+"/options", true);
+    xhttp.send();
+    
+  }
+  componentDidMount() {
+    
+  }
+  render(){
+
+    let optionButton = ({item, index, separators})=> (<Button raised primary text={item.title} onPress={sendLightOption.bind(null,item.key)}/>);
+    /*
+      <View style={{flex:2, backgroundColor: 'white'}}>
+      <Toolbar leftElement="menu"></Toolbar>  
+      </View>
+     */
+
+    return (      
+      <ThemeContext.Provider value={getTheme(uiTheme)} >
+      <StatusBar barStyle = "light-content" hidden = {false} backgroundColor = "#00BCD4" translucent = {true} />
+      <View style={styles.container}>
+          <View style={{flex:2, backgroundColor: 'white'}}>
+            <FlatList data={this.state.options} renderItem={optionButton} />
+          </View>          
+      </View>
+      </ThemeContext.Provider>
+    );
+    
+  }
+};
+
+
+var sendLightOption = function(index){
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("GET", "http://"+rpi_light_address+"/select?"+encodeQueryData({option:index}), true);
+  xhttp.send();
+}
+
+var getLightOptions = function(){
+  var xhttp = new XMLHttpRequest();
+  	xhttp.onreadystatechange = function() {
+      console.log( this.status );
+	    if (this.readyState == 4 && this.status == 200) {
+	    	var data = JSON.parse(this.responseText);
+        console.log(main.state);
+        main.state.options = data.effects.map((item,index)=>{
+          return { title:item,  key:index.toString() };
+        });
+        main.setState(main.state);
+        
+        console.log('options',data.effects);
+	    }
+	  };
+    xhttp.open("GET", "http://"+rpi_light_address+"/options", true);
+    xhttp.send();
+}
+
+function encodeQueryData(data) {
+  let ret = [];
+  for (let d in data){
+   ret.push(encodeURIComponent(d) + '=' + encodeURIComponent(data[d]));
+  }
+  return ret.join('&');
+}
