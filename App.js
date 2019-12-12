@@ -24,7 +24,7 @@ import Zeroconf from 'react-native-zeroconf';
 
 const zeroconf = new Zeroconf();
 
-var rpi_light_address = null //"192.168.5.68";
+var rpiLightAddress = null //"192.168.5.68";
 let options = [];
 
 const uiTheme = {
@@ -85,22 +85,22 @@ export default class Main extends React.Component {
         console.log('options',data.effects);
 	    }
 	  };
-    xhttp.open("GET", "http://"+rpi_light_address+"/options", true);
+    xhttp.open("GET", "http://"+rpiLightAddress+"/options", true);
     xhttp.send();
     */
   }
   componentDidMount() {
     zeroconf.on('start', () => console.log('The scan has started.'));
-    zeroconf.on('found', (e) => console.log('found',e) );
+    //zeroconf.on('found', (e) => console.log('found',e) );
     zeroconf.on('resolved', this.updateServices.bind(this) );
     zeroconf.on('error',(e)=>console.log('error',e));
     zeroconf.on('stop',e=>console.log(e));
-    zeroconf.on('update', (e)=>console.log('updated',e));
+    //zeroconf.on('update', (e)=>console.log('updated',e));
 
     zeroconf.scan('lights', 'tcp', 'local.');
   }
   updateServices(){
-    console.log("Updating services list");
+    //console.log("Updating services list");
     let services = zeroconf.getServices();
     
     this.setState(prevState=>({
@@ -110,13 +110,13 @@ export default class Main extends React.Component {
     }));
   }
   setLight(address, index){
-    rpi_light_address = address;
+    rpiLightAddress = address;
     this.getLightOptions();
   }
   sendLightOption(index){
     
     var xhttp = new XMLHttpRequest();
-    xhttp.open("GET", "http://"+rpi_light_address+"/select?"+encodeQueryData({option:index}), true);
+    xhttp.open("GET", "http://"+rpiLightAddress+"/select?"+encodeQueryData({option:index}), true);
     xhttp.send();
     this.setState(prevState=>({
       services:prevState.services,
@@ -126,15 +126,13 @@ export default class Main extends React.Component {
   }
   
   getLightOptions(){
-    if(!rpi_light_address)
+    if(!rpiLightAddress)
       return;
     var main = this;
     var xhttp = new XMLHttpRequest();
       xhttp.onreadystatechange = function() {
-        console.log( this.status );
         if (this.readyState == 4 && this.status == 200) {
           var data = JSON.parse(this.responseText);
-          console.log(main.state);
           let options = data.effects.map((item,index)=>{
             return { title:item,  key:index.toString() };
           });
@@ -144,31 +142,9 @@ export default class Main extends React.Component {
             lightOptionIndex:data.selected
           }));
           
-          console.log('options',data.effects);
         }
       };
-      xhttp.open("GET", "http://"+rpi_light_address+"/options", true);
-      xhttp.send();
-  }
-  getLightOptions(){
-    if(!rpi_light_address)
-      return;
-    var main = this;
-    var xhttp = new XMLHttpRequest();
-      xhttp.onreadystatechange = function() {
-        console.log( this.status );
-        if (this.readyState == 4 && this.status == 200) {
-          var data = JSON.parse(this.responseText);
-          console.log(main.state);
-          main.state.options = data.effects.map((item,index)=>{
-            return { title:item,  key:index.toString() };
-          });
-          main.setState(main.state);
-          
-          console.log('options',data.effects);
-        }
-      };
-      xhttp.open("GET", "http://"+rpi_light_address+"/options", true);
+      xhttp.open("GET", "http://"+rpiLightAddress+"/options", true);
       xhttp.send();
   }
   render(){
@@ -182,7 +158,6 @@ export default class Main extends React.Component {
     var main = this;
     
     let lightServiceItems = this.state.services.map( (s, i) => {
-      console.log(s);
       return <Picker.Item key={i} value={s.addresses[0].toString()} label={s.name} />
     });
 
