@@ -1,4 +1,5 @@
 {
   "name": "RpiLightsApp",
-  "displayName": "RpiLightsApp"
+  "displayName": "RpiLightsApp",
+  "icon": "favicon.png",
 }

@@ -2432,6 +2432,11 @@ eventemitter3@^3.0.0:
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-3.1.2.tgz#2d3d48f9c346698fce83a85d7d664e98535df6e7"
   integrity sha512-tvtQIeLVHjDkJYnzf2dgVMxfuSGJeM/7UCG17TT4EumTfNtF+0nebF/4zWOIkCreAbtNqhGEboB6BWrwqNaw4Q==
 
+events@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/events/-/events-3.0.0.tgz#9a0a0dfaf62893d92b875b8f2698ca4114973e88"
+  integrity sha512-Dc381HFWJzEOhQ+d8pkNon++bk9h6cdAoAj4iE6Q4y6xgTzySWXlKn05/TVNpjnfRqi/X0EpJEJohPjNI3zpVA==
+
 exec-sh@^0.3.2:
   version "0.3.4"
   resolved "https://registry.yarnpkg.com/exec-sh/-/exec-sh-0.3.4.tgz#3a018ceb526cc6f6df2bb504b2bfe8e3a4934ec5"
@@ -5258,6 +5263,13 @@ react-native-vector-icons@^6.6.0:
     lodash "^4.0.0"
     prop-types "^15.6.2"
     yargs "^13.2.2"
+
+react-native-zeroconf@^0.11.4:
+  version "0.11.4"
+  resolved "https://registry.yarnpkg.com/react-native-zeroconf/-/react-native-zeroconf-0.11.4.tgz#5be641b9c456dcd0ea24992880b1891a438595fe"
+  integrity sha512-rMN8PGtnr596bgqibG1j19i+XMBx6ttfnm5YhiuUCTWoCfuUu9pC6cFj6TkH+osAdaJib9gur3i6jCs3/nnO1g==
+  dependencies:
+    events "^3.0.0"
 
 react-native@0.61.5:
   version "0.61.5"
