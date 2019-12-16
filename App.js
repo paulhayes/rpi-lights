@@ -56,7 +56,10 @@ const styles = StyleSheet.create({
 
   },
   lightOptionsContainer: {
-    flex:13
+    flex:11
+  },
+  lightSettingsContainer: {
+    flex:2
   },
   paragraph: {
     margin: 24,
@@ -233,6 +236,9 @@ export default class Main extends React.Component {
           </View>
           <View style={styles.lightOptionsContainer}>
             <FlatList data={this.state.options} renderItem={optionButton} />
+          </View>  
+          <View style={styles.lightSettingsContainer}>
+            
           </View>         
       </View>
       </ThemeContext.Provider>
