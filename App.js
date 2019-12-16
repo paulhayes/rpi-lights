@@ -7,7 +7,8 @@ import {
   Text,
   Picker,
   StatusBar,
-  FlatList
+  FlatList,
+  Button  
 } from 'react-native';
 
 import {
@@ -18,11 +19,11 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
-import { ThemeContext, getTheme, Button, Toolbar } from 'react-native-material-ui';
+import { ThemeContext, getTheme, Toolbar } from 'react-native-material-ui';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import Zeroconf from 'react-native-zeroconf';
 
-const zeroconf = new Zeroconf();
 
 var rpiLightAddress = null //"192.168.5.68";
 let options = [];
@@ -44,8 +45,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection:'column',
-    paddingTop: StatusBar.currentHeight,
     backgroundColor: '#ecf0f1',
+    paddingTop: StatusBar.currentHeight    
+  },
+  lightSelectContainer: {
+    flex: 1,
+    flexDirection:'row',
+    backgroundColor: '#ecf0f1',
+    height:200
+
+  },
+  lightOptionsContainer: {
+    flex:13
   },
   paragraph: {
     margin: 24,
@@ -54,6 +65,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#34495e',
   },
+  buttonSelected:{
+    color:'#DA5932'
+  },
+  buttonUnselected:{
+    marginBottom:10,
+    padding:10
+  }
 });
 
 export default class Main extends React.Component {
@@ -63,8 +81,12 @@ export default class Main extends React.Component {
     services:[],
     lightOptionIndex:0
   }
+  zeroconf = new Zeroconf()
+
   constructor(props){
     super(props);
+
+    //zeroconf.on('update', (e)=>console.log('updated',e));
 
     
     var main = this;
@@ -90,19 +112,35 @@ export default class Main extends React.Component {
     */
   }
   componentDidMount() {
+    let zeroconf = this.zeroconf;
     zeroconf.on('start', () => console.log('The scan has started.'));
     //zeroconf.on('found', (e) => console.log('found',e) );
     zeroconf.on('resolved', this.updateServices.bind(this) );
     zeroconf.on('error',(e)=>console.log('error',e));
-    zeroconf.on('stop',e=>console.log(e));
-    //zeroconf.on('update', (e)=>console.log('updated',e));
+    zeroconf.on('stop',e=>console.log('stopping scan',e));
+
 
     zeroconf.scan('lights', 'tcp', 'local.');
   }
+  componentWillUnmount() {
+    this.zeroconf.removeAllListeners();
+  }
+  rescan(){
+    
+    this.zeroconf.stop();
+    this.zeroconf.scan('lights', 'tcp', 'local.');
+
+  }
   updateServices(){
     //console.log("Updating services list");
-    let services = zeroconf.getServices();
-    
+    let services = this.zeroconf.getServices();
+    let firstService = Object.values(services)[0];
+    console.log("updateServices",this.state.options,firstService);
+    if(this.state.options.length==0 && firstService){
+      console.log('address',firstService.addresses[0].toString());
+      rpiLightAddress = firstService.addresses[0].toString()
+      this.getLightOptions();
+    }
     this.setState(prevState=>({
       options:prevState.options,
       services:Object.values(services),
@@ -110,8 +148,11 @@ export default class Main extends React.Component {
     }));
   }
   setLight(address, index){
-    rpiLightAddress = address;
-    this.getLightOptions();
+    console.log("setLight",address,index);
+    if(index>=0){
+      rpiLightAddress = address;
+      this.getLightOptions();  
+    }
   }
   sendLightOption(index){
     
@@ -128,6 +169,7 @@ export default class Main extends React.Component {
   getLightOptions(){
     if(!rpiLightAddress)
       return;
+    console.log("get light options");
     var main = this;
     var xhttp = new XMLHttpRequest();
       xhttp.onreadystatechange = function() {
@@ -149,8 +191,12 @@ export default class Main extends React.Component {
   }
   render(){
 
-    let optionButton = ({item, index, separators})=> (<Button raised {...((index==this.state.lightOptionIndex)?{"accent":true}:{"primary":true})} text={item.title} onPress={this.sendLightOption.bind(this,item.key)}/>);
-    /*
+    let optionButton = ({item, index, separators})=> {
+      let color = (index==this.state.lightOptionIndex)?styles.buttonSelected.color:styles.buttonUnselected.color;
+      //raised={false} type='clear'
+      return (<View style={{paddingBottom:2}}><Button  color={color} title={item.title} onPress={this.sendLightOption.bind(this,item.key)}/></View>);
+    }
+      /*
       <View style={{flex:2, backgroundColor: 'white'}}>
       <Toolbar leftElement="menu"></Toolbar>  
       </View>
@@ -161,17 +207,33 @@ export default class Main extends React.Component {
       return <Picker.Item key={i} value={s.addresses[0].toString()} label={s.name} />
     });
 
+    let noLightsFound = lightServiceItems.length==0;
+
+    if(noLightsFound){
+      lightServiceItems.push( <Picker.Item key={-1} label="Searching for lights" /> );
+    } else {
+
+    }
     return (      
       <ThemeContext.Provider value={getTheme(uiTheme)} >
       <StatusBar barStyle = "light-content" hidden = {false} backgroundColor = "#00BCD4" translucent = {true} />
-      <View style={styles.container}>
-          <View style={{flex:2, backgroundColor: 'white'}}>
-            <Picker onValueChange={main.setLight.bind(this)}>
-              {lightServiceItems}
-            </Picker>
-
+      
+  
+      <View style={styles.container}>          
+          <View style={styles.lightSelectContainer}>
+            <Icon.Button style={{flex:1}} borderRadius={0} name="refresh" onPress={main.rescan.bind(main)} />
+            
+            <View style={{flex:5, backgroundColor: 'white'}}>
+            
+              <Picker onValueChange={main.setLight.bind(this)} enabled={!noLightsFound}>
+                {lightServiceItems}
+              </Picker>
+                        
+            </View> 
+          </View>
+          <View style={styles.lightOptionsContainer}>
             <FlatList data={this.state.options} renderItem={optionButton} />
-          </View>          
+          </View>         
       </View>
       </ThemeContext.Provider>
     );
