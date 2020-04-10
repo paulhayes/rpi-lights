@@ -86,7 +86,11 @@ let Color = module.exports = class {
 		vw = vw || vb;
 		let pow = Math.pow;
 		return new Color(pow(this.r,vr),pow(this.g,vg),pow(this.b,vb),pow(this.w,vw));
-	}
+    }
+    
+    clone(){
+        return new Color(this.r,this.g,this.b,this.w);
+    }
 
 	static lerp(color1,color2,t){
 		t=Math.min(1,Math.max(0,t));
@@ -108,7 +112,12 @@ let Color = module.exports = class {
 		let g = buffer.data[offset+1];
 		let b = buffer.data[offset+2];
 		return new Color(r/255,g/255,b/255,0);
-	}
+    }
+    
+    static createArray(length, color){
+        color = color || new Color(0,0,0);
+        return new Array(length).fill(color);
+    }
 
 }
 

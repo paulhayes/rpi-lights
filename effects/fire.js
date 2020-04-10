@@ -21,7 +21,7 @@ module.exports = class {
 		this.currentColors = new Float32Array(this.numPixels);
 		this.lastColors = new Float32Array(this.numPixels);
 		this.tempColors = new Float32Array(this.numPixels);
-
+        
 		
 	}
 

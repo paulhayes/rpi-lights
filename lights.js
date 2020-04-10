@@ -12,6 +12,7 @@ const Daylight = require('./effects/daylight');
 const Movement = require('./effects/movement');
 const Fire = require('./effects/fire');
 const Wave = require('./effects/wave');
+const Disco = require('./effects/disco');
 const Chase = require('./effects/chase.js');
 const Scroll = require('./effects/scroll');
 const Color = require('./Color');
@@ -63,14 +64,15 @@ var effects = [
   new Plain("blue",0,0,1,0),
   new Plain("low yellow",0.2,0.15,0,0),
   new Plain("bright yellow",1,0.5,0,0),
-  new Movement("movement",60,new Plain("low white",0,0,0,0.7)),
-  new Movement("movement",60,new Plain("low white",0,0,0,0.7)),
+  //new Movement("movement",60,new Plain("low white",0,0,0,0.7)),
+  //new Movement("movement",60,new Plain("low white",0,0,0,0.7)),
   new Fire(),
   new Fire("Blue fire",new Color(0,0,0.8,0.2),new Color(0,0,0.2,0)),
   new Fire("Green fire",new Color(0,0.8,0,0.2),new Color(0,0.2,0,0)),
   new Scroll("Random Scroll", new Random(NUM_LEDS,new Color(0,0,0,0),new Color(0,0,1,0.8)), 20),
   new Scroll("Random Scroll", new Random(NUM_LEDS,new Color(0,0,0,0),new Color(1,0,1,0)), 20),
   new Wave("Orange wave",new Color(0,0,0,0),new Color(1,0.5,0,0), 1, 1),
+  new Disco("Disco"),
   new ColorTest(),
   new GammaTest(),
   new GammaTest("gamma 1/4 ",1,4),
