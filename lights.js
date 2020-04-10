@@ -107,7 +107,7 @@ setInterval(function() {
 console.log('Press <ctrl>+C to exit.');
 
 function onExternalSwitchChange(pin){
-  let isOn = rpio.read(pin);
+  let isOn = rpio.read(pin) === rpio.LOW;
   if(isOn && currentEffect===offEffect ){
     popEffect();
   }

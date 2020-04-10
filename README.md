@@ -22,6 +22,14 @@ I used 144 per meter density LEDs. Although any density will work.
 
 **Power per meter for 144 density strips*
 
+### Wiring
+
+Raspberry PI
+* Pin 2 - 5v 
+* Pin 6 - Ground
+* Pin 11 - Switch ( connect to GND )
+* Pin 12 - sk6812-grbw LEDs
+
 ### Setting up Raspberry Pi
 
 Create an SD card with the latest raspbian image.
