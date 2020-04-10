@@ -20,6 +20,7 @@ const Random = require('./patterns/Random');
 const settingsPath = '/boot/light-settings.json';
 const NUM_LEDS = 576;
 const STRIP_TYPE = "sk6812-grbw";
+const rpio = require('rpio');
 
 const channels = ws281x.init({
   dma: 10,
@@ -30,6 +31,9 @@ const channels = ws281x.init({
 const channel = channels[0];
 const pixelData = channel.array;
 let lastTime = Date.now();
+
+const externalSwitchPin = 11;
+
 
 // ---- trap the SIGINT and reset before exit
 process.on('SIGINT', function() {
@@ -79,7 +83,9 @@ var effects = [
   new GammaTest("gamme 3/4 ",3,4),
   new GammaTest("full ",4,4)
 ];
+const offEffect = effects[0];
 var currentEffect;
+var effectStack = [];
 
 
 effects.forEach((e)=>e.init(NUM_LEDS));
@@ -100,6 +106,18 @@ setInterval(function() {
 
 console.log('Press <ctrl>+C to exit.');
 
+function onExternalSwitchChange(pin){
+  let isOn = rpio.read(pin);
+  if(isOn && currentEffect===offEffect ){
+    popEffect();
+  }
+  else if(!isOn){
+    pushEffect();
+    selectEffect(0);
+  }
+}
+rpio.open(externalSwitchPin, rpio.INPUT);
+rpio.poll(externalSwitchPin, onExternalSwitchChange);
 
 function returnFile(res,file,mime){
   var filePath = path.join(__dirname, file);
@@ -127,14 +145,28 @@ function parseOption(obj,res){
   if( 'option' in obj ){
     let effectIndex = parseInt(obj.option,10);
     selectEffect(effectIndex);
-    fs.writeFile(settingsPath,JSON.stringify({effectIndex:effectIndex}));
+    fs.writeFile(settingsPath,JSON.stringify({effectIndex:effectIndex}),function(){
+    });
   }
 }
 
 function selectEffect(effectIndex){
+  if(effectIndex===0){
+    pushEffect();
+  }
   if( effectIndex >= 0 && effectIndex < effects.length ){
       currentEffect = effects[effectIndex];
     }
+}
+
+function pushEffect(){
+  if(currentEffect!==offEffect)
+    effectStack.push(currentEffect);
+}
+
+function popEffect(){
+  if(effectStack.length)
+    currentEffect = effectStack.pop();
 }
 
 const server = http.createServer((req, res) => {
