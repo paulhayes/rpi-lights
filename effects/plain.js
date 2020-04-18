@@ -8,7 +8,6 @@ module.exports = class {
 	
 	constructor(name, r,g,b,w){
 		this.numPixels;
-		this.colors;
 		if( r instanceof Color ){
 			this.color = r;
 		}
@@ -20,10 +19,33 @@ module.exports = class {
 
 	init(num){
 		this.numPixels = num;
-		this.colors = new Array(this.numPixels).fill(this.color);
+		//this.colors = new Array(this.numPixels).fill(this.color);
 	}
 
 	update(pixels){
-		Color.toIntArray(this.colors, pixels);
+		Color.toIntArray(this.color, pixels);
+	}
+
+	getConfig(){
+		return {
+			"data":this.color.toString()
+		}
+	}
+
+	setConfig(data){
+		this.colors.fromString(data.color);
+	}
+
+	getProperties(){
+		return [
+			{
+				"label":"color",
+				"type":"color",
+			}
+		]
+	}
+
+	static getDescription(){
+		return "Single Color";
 	}
 };
