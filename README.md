@@ -44,6 +44,8 @@ Create an SD card with the latest raspbian image.
 - Install node js, instructions here: https://github.com/sdesalas/node-pi-zero
 - Clone this repo: ```git clone git@github.com:paulhayes/rpi-lights.git```
 - Copy config.txt to boot ```cp config.txt /boot/config.txt```
+- Install Avahi: ```sudo apt-get install avahi```
+- Copy service file: ```cp lights.service /etc/avahi/services/lights.service```
 
 ### Setup
 
