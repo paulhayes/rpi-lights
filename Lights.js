@@ -6,24 +6,21 @@ const STRIP_TYPE = "sk6812-grbw";
 
 const Color = require('./Color');
 const Plain = require('./effects/plain');
+const Effects = new (require('./effects/Effects'))();
+/*
+const effectTypes = {
+    Plain
+};
+effectTypes.entries.forEach(([k,v]=>v.class=k));
+*/
+
 module.exports = class {
 
     constructor(settings,numLeds){
 
-        const types = [
-            Plain
-          ];
+        this.setData(settings);
 
-        settings.load().then((e,data)=>{
-            try {
-              this.selectEffect( settings.effectIndex );
-            }
-            catch(e){
-              console.warn("Error reading JSON settings file");
-            }
-          
-        });
-
+        
         const channels = ws281x.init({
             dma: 10,
             freq: 800000,
@@ -103,5 +100,31 @@ module.exports = class {
         if( effectIndex >= 0 && effectIndex < this.effects.length ){
             this.currentEffect = this.effects[effectIndex];
           }
-      }
+    }
+
+    getData(){
+        return {
+            effectIndex:this.currentEffectIndex,
+            effects:this.effects.map((effect)=>Effects.toJson(effect))
+        }
+    }
+
+    setData(settings){
+        this.selectEffect( settings.effectIndex );
+        if(settings.effects) this.effects = settings.effects.map((data)=>Effects.fromJson(data));
+    }
+
+        /*
+    createEffectFromConfig(c){
+        let effect = new effectTypes[c.class];
+        effect.setConfig(c);
+        return effect;
+    }
+
+    getEffectConfig(e){
+        let config = e.getConfig();
+        config.class = e.class;
+        return config;
+    }
+    */
 }

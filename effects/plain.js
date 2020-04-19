@@ -28,11 +28,13 @@ module.exports = class {
 
 	getConfig(){
 		return {
+			"name":this.name,
 			"data":this.color.toString()
 		}
 	}
 
 	setConfig(data){
+		this.name = data.name;
 		this.colors.fromString(data.color);
 	}
 

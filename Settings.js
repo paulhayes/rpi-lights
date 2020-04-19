@@ -11,7 +11,7 @@ module.exports = class {
         Object.assign(this,JSON.parse(settingStr));
       }
       catch(e){
-        
+        console.warn("Error reading JSON settings file");
       }
       
       return this;

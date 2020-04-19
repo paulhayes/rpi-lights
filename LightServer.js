@@ -42,8 +42,8 @@ module.exports = class {
         
         if( 'option' in obj ){
             let effectIndex = parseInt(obj.option,10);
-            this.lights.selectEffect(effectIndex);
-            this.settings.save(JSON.stringify({effectIndex:this.lights.currentEffectIndex,effects:this.lights.effects.map((e)=>e.getConfig())}));            
+            this.lights.selectEffect(effectIndex);            
+            this.settings.save(JSON.stringify(lights.getData()));           
         }
     }
       
