@@ -6,7 +6,8 @@ const STRIP_TYPE = "sk6812-grbw";
 
 const Color = require('./Color');
 const Plain = require('./effects/plain');
-const Effects = new (require('./effects/Effects'))();
+const Effects = new require('./effects/Effects');
+
 /*
 const effectTypes = {
     Plain
@@ -17,9 +18,6 @@ effectTypes.entries.forEach(([k,v]=>v.class=k));
 module.exports = class {
 
     constructor(settings,numLeds){
-
-        this.setData(settings);
-
         
         const channels = ws281x.init({
             dma: 10,
@@ -30,17 +28,9 @@ module.exports = class {
         const channel = channels[0];
         this.pixelData = channel.array;
 
-        const offEffect =new Plain();
-        this.effects = [
-            offEffect,
-            new Plain("red",new Color(1,0,0))
-        ];
-        
-
         this.effectStack = [];
         this.numLeds = numLeds;
-        this.effects.forEach((e)=>e.init(numLeds));
-
+        
         // ---- trap the SIGINT and reset before exit
         process.on('SIGINT', function() {
             ws281x.reset();
@@ -48,6 +38,10 @@ module.exports = class {
             process.exit(0);
             });
         });
+
+        this.setData(settings);
+        this.effects.forEach((e)=>e.init(numLeds));
+
     }
 
     get currentEffectIndex(){
@@ -109,9 +103,19 @@ module.exports = class {
         }
     }
 
-    setData(settings){
+    setData(settings){      
+        if(settings.effects) this.effects = settings.effects.map((data)=>Effects.fromJson(data)).filter((e)=>!!e);
+        if(!this.effects || !this.effects.length){
+          console.log("no effects found. Creating defaults");
+          const offEffect =new Plain();
+        
+          this.effects = [
+            offEffect,
+            new Plain("white",new Color(0,0,0,1))
+          ];
+        }
         this.selectEffect( settings.effectIndex );
-        if(settings.effects) this.effects = settings.effects.map((data)=>Effects.fromJson(data));
+
     }
 
         /*

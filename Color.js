@@ -94,10 +94,15 @@ const Color = module.exports = class {
 	
 	toString(){
 		return `${this.r},${this.g},${this.b},${this.w}`;
-	}
+  }
+  
+  toHex(){
+    return `#${toByte(this.r)}${toByte(this.g)}${toByte(this.b)}`;
+  }
 
-	fromString(str){
-		[ this.r, this.g, this.b, this.w ] = str.split(',').map(parseFloat);
+	static fromString(str){
+    let [ r, g, b, w ] = str.split(',').map(parseFloat);
+    return new Color(r,g,b,w);
 	}
 
 	static lerp(color1,color2,t){

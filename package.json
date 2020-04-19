@@ -4,6 +4,7 @@
   "main": "main.js",
   "dependencies": {
     "express": "^4.17.1",
+    "nodemon": "^2.0.3",
     "onoff": "^1.2.0",
     "parse-png": "^1.1.2",
     "rpi-ws281x-native": "github:paulhayes/node-rpi-ws281x-native#v1.x",

@@ -29,21 +29,29 @@ module.exports = class {
 	getConfig(){
 		return {
 			"name":this.name,
-			"data":this.color.toString()
+			"color":this.color.toString()
 		}
 	}
 
 	setConfig(data){
-		this.name = data.name;
-		this.colors.fromString(data.color);
+    this.name = data.name;
+    this.color = Color.fromString(data.color);
 	}
 
 	getProperties(){
 		return [
+      {
+        "id":"name",
+        "label":"Name",
+        "type":"text",
+        "value":this.name
+      },
 			{
-				"label":"color",
-				"type":"color",
-			}
+        "id":"color",
+        "label":"Color",
+        "type":"color",
+        "value":this.color.toString()
+      }      
 		]
 	}
 

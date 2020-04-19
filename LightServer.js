@@ -3,6 +3,7 @@
 const http = require('http');
 const express = require('express');
 const url = require('url');
+const Effects = require('./effects/Effects');
 
 
 module.exports = class {
@@ -13,15 +14,24 @@ module.exports = class {
         
         server.get('/select',this.parseOption.bind(this));
         
-        server.put('/effect/add',function(res,req){
+        server.put('/effect/add',function(req,res){
         
         });
         
-        server.get('/effect_types',function(res,req){
-        
+        server.get('/effect_types',function(req,res){
+          res.json(Object.keys(Effects.types));
+          //res.json(Object.fromEntries(Object.entries(Effects.types).map(([n,et])=>[et.getDescription(),et.getProperties()])));
         });
-        
-        
+
+        server.get('/effect_settings',function(req,res){
+          let queryObj = url.parse(req.url,true).query;
+          if('effect' in queryObj){
+            let effectIndex = parseInt(queryObj.effect,10);
+            console.log(lights.effects[effectIndex]);
+            res.json(lights.effects[effectIndex].getProperties());
+          }
+        });
+               
         server.listen(80);
 
         this.lights = lights;
@@ -36,14 +46,14 @@ module.exports = class {
       }
       
     parseOption(req,res){
-        let obj = url.parse(req.url,true).query;
+        let queryObj = url.parse(req.url,true).query;
         res.setHeader('Content-Type', 'application/json');
         res.end( JSON.stringify({status:'okay'}) );
         
-        if( 'option' in obj ){
-            let effectIndex = parseInt(obj.option,10);
+        if( 'option' in queryObj ){
+            let effectIndex = parseInt(queryObj.option,10);
             this.lights.selectEffect(effectIndex);            
-            this.settings.save(JSON.stringify(lights.getData()));           
+            this.settings.save(JSON.stringify(this.lights.getData()));           
         }
     }
       

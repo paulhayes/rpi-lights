@@ -1,7 +1,6 @@
 "use strict";
 
 const path = require('path');
-
 const rpio = require('rpio');
 
 /*
@@ -17,7 +16,7 @@ const Scroll = require('./effects/scroll');
 const Random = require('./patterns/Random');
 */
 
-const settingsPath = '/boot/light-settings.json';
+const settingsPath = './light-settings.json';
 const settings = new (require('./Settings'))(settingsPath);
 const NUM_LEDS = 576;
 
