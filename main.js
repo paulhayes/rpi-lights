@@ -23,7 +23,7 @@ const NUM_LEDS = 576;
 const Lights = require('./Lights');
 const LightingServer = require('./LightServer');
 
-
+process.chdir(__dirname);
 
 /*
 var effects = [
