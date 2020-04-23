@@ -5,13 +5,17 @@ var _path;
 module.exports = class {
     constructor(path){
       _path = path;
+      this.numLights = 576;
+      this.effectIndex = 0;
+      this.effects = [];
     }
     
     async load(){
       try{
-        this.numLights = 576;
         const settingStr = await fs.readFile(_path,"utf8");
-        Object.assign(this,JSON.parse(settingStr));
+        let data = JSON.parse(settingStr);
+        this.assign(data);
+        //Object.assign(this,data);
       }
       catch(e){
         console.warn("Error reading JSON settings file");
@@ -21,10 +25,13 @@ module.exports = class {
     }
 
     async save(data){
-      console.log("settings:");
-      console.log(this);
-      return await fs.writeFile(_path,data);
+      this.assign(data); 
+      return await fs.writeFile(_path,JSON.stringify(this));
     }
 
-    
+    assign(source){
+      let keysInBoth = Object.keys(this).filter((k)=>(k in source));
+      let target = this;
+      keysInBoth.forEach((k)=>target[k]=source[k]);
+    }
 }

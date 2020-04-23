@@ -22,8 +22,7 @@ module.exports = class {
           if(effectIndex!==false){
             lights.selectEffect(effectIndex);
             res.end( JSON.stringify({status:'okay'}) );
-            settings.save(JSON.stringify(lights.getData())); 
-
+            lights.save();
           }
           else {
             res.statusCode = 400;
@@ -34,7 +33,7 @@ module.exports = class {
         server.put('/effects/add',function(req,res){
           let effectCreated = lights.addEffect();
           lights.selectEffect(lights.effects.length-1); 
-          settings.save(JSON.stringify(lights.getData())); 
+          lights.save();
           return res.json({effectIndex:lights.currentEffectIndex});          
         });
         
@@ -52,8 +51,8 @@ module.exports = class {
         });
 
         server.post('/effects/settings',function(req,res){
-
-          settings.save(JSON.stringify(this.lights.getData())); 
+          lights.save();
+           
         })
                
         server.listen(80);

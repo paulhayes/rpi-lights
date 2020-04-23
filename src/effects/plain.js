@@ -7,7 +7,7 @@ const Color = require('../Color');
 module.exports = class {
 	
 	constructor(r,g,b,w){
-		this.numPixels;
+		
 		if( r instanceof Color ){
 			this.color = r;
 		}
@@ -28,13 +28,11 @@ module.exports = class {
 
 	getConfig(){
 		return {
-			"name":this.name,
 			"color":this.color.toString()
 		}
 	}
 
 	setConfig(data){
-    	this.name = data.name;
     	this.color = Color.fromString(data.color);
 	}
 

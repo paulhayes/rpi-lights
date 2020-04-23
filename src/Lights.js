@@ -116,6 +116,10 @@ module.exports = class {
 
     }
 
+    save(){
+        this.settings.save(this.getData());
+    }
+
         /*
     createEffectFromConfig(c){
         let effect = new effectTypes[c.class];
