@@ -44,8 +44,12 @@
       op.text = option;
       selectNode.options.add(op);
       });
-      selectNode.value = data.selected;
-      selectNode.onchange = selectEffect;
+      let selectedEffectIndex = parseInt(data.selected);
+      if(selectedEffectIndex>=0){
+        selectNode.value = data.selected;
+        selectNode.onchange = selectEffect;
+        populateEffect(selectedEffectIndex);
+      }
     }
   };
   xhttp.open("GET", "/effects", true);
@@ -66,6 +70,24 @@
     while(effectFields.childElementCount>0){
       effectFields.removeChild(effectFields.lastElementChild)
     }
+  }
+
+  const sendProperty = async function(effectIndex,property,value){
+    const data = {};
+    data[property] = value;
+    const response = await fetch(`/effects/settings/${effectIndex}`,{
+      method:"PUT",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body:JSON.stringify(data)
+    });
+    if( response.status !== 200 ){
+      console.warn(response.status,response.error);
+      return;
+    }
+    const responseData = await response.json();
+    console.log(data);
   }
 
   const populateEffect = function(effectIndex){
@@ -89,20 +111,30 @@
         label.innerText = effectProps.label;
         input.value = effectProps.value;
         input.type = effectProps.type;
-        if(effectProps.type=="select"){
+        if(effectProps.type==='select'){
           let selectInput = document.createElement("select");
-          for( let option in effectProps.options ){
+          
+          for( let option of effectProps.options ){
+            let optionElement = document.createElement("option");
             console.log(option);
-
+            optionElement.innerText = option[1];
+            optionElement.value = option[0];
+            selectInput.appendChild(optionElement);
           }
           inputContainer.appendChild(label);
+          inputContainer.appendChild(selectInput);
+          selectInput.onchange = function(){
+            sendProperty(effectIndex,effectProps.id,selectInput.value);
+          };
+          
         }
         else if(effectProps.type==='color'){
           //create multiple elements
           let colorInput = input;
           let whiteInput = document.createElement("input");
-          let rgb = "rgb("+effectProps.value.split(",").slice(0,3).join(",")+")";
+          let rgb = "#"+effectProps.value.split(",").slice(0,3).map((g)=>Math.round(parseFloat(g)*0xff).toString(16)).map((d)=>"00".slice(0,2-d.length)+d ).join("");
           let w = effectProps.value.split(",").slice(-1);
+          console.log("color data:",effectProps.value,rgb,w);
           whiteInput.type = "range";
           whiteInput.min = 0;
           whiteInput.max = 1;
@@ -115,7 +147,7 @@
             let colorStr = bytePositions.map((p)=>(parseInt(colorInput.value.substr(p,2),16)/255).toFixed(2) ).join(',');
             
             colorStr += ','+parseFloat(whiteInput.value).toFixed(2);
-            sendEffectSetting( effectIndex, effectProps.id, colorStr );
+            sendProperty( effectIndex, effectProps.id, colorStr);
           }
           whiteInput.oninput = onInput;
           colorInput.oninput = onInput;
@@ -123,7 +155,6 @@
           inputContainer.appendChild(label);
           inputContainer.appendChild(colorInput);
           inputContainer.appendChild(whiteInput);
-          effectFields.appendChild(inputContainer);
         }
         else {
           input.onchange = function(){
@@ -135,24 +166,21 @@
             if(effectProps.type==='number' || effectProps.type==='range'){
               value = parseFloat(value);
             }
-            sendEffectSetting( effectIndex, effectProps.id, input.value );
+            sendProperty( effectIndex, effectProps.id, input.value );
           }
           inputElements.push([effectProps.id,input]);
           inputContainer.appendChild(label);
           inputContainer.appendChild(input);
-          effectFields.appendChild(inputContainer);
         }
-        
+        effectFields.appendChild(inputContainer);
       });
     });
   }
 
-  const sendEffectSetting = function (effectIndex,id,setting){    
-    console.log(effectIndex,id,setting);
-  }
-
   createEffectBtn.addEventListener('click',async function(e){
-    const response = await fetch("/effects/add",{method:"PUT"});
+    const response = await fetch("/effects/add",{
+      method:"PUT",
+    });
     const data = await response.json();
     console.log(data);
     populateEffect(data.effectIndex);

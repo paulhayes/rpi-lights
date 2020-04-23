@@ -27,6 +27,7 @@ module.exports = {
 
 
     getParamInt(params,propName){
-        return (propName in params) ? parseInt( params[propName] ) : false;
+        let val = parseInt( params[propName] );
+        return Number.isInteger(val) ? val : false;
     }
 }

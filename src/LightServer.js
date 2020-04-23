@@ -10,7 +10,7 @@ module.exports = class {
 
         const server = this.server = express();
         server.use(express.static('./public'));
-
+        server.use(express.json())
         server.get('/effects',(req,res)=>{
           res.statusCode = 200;
           let effectIndex = Math.max(0, lights.currentEffectIndex);
@@ -45,9 +45,28 @@ module.exports = class {
 
         server.get('/effects/settings/:effectIndex',function(req,res){
           let effectIndex = getParamInt(req.params,"effectIndex");
-          lights.selectEffect(effectIndex);            
-            
-          res.json(lights.effects[effectIndex].getProperties());
+          if(effectIndex===false){
+            res.statusCode = 401;
+            res.json("Missing property effectIndex");
+            return;
+          }
+          console.log(effectIndex);
+          lights.selectEffect(effectIndex);
+          res.json(lights.effects[effectIndex].getProperties());  
+      });
+
+        server.put('/effects/settings/:effectIndex',function(req,res){
+          let effectIndex = getParamInt(req.params,"effectIndex");
+          console.log(req.body);
+          if(effectIndex===false){
+            res.statusCode = 401;
+            res.json("Missing property effectIndex");
+            return;
+          }
+          lights.effects[effectIndex].fromJson(req.body);
+          //lights.setProperties(effectIndex,);
+          res.json({status:"ok"});
+          lights.save();
         });
 
         server.post('/effects/settings',function(req,res){

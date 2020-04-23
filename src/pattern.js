@@ -46,18 +46,15 @@ module.exports = class {
     }
 
     fromJson(data){
-        if(!data.effectType){
-          console.warn("no effectType found in effect json data");
-          return;
+        if('effectType' in data){
+          this.effectType = data.effectType || Object.keys( this.types )[0];
+          this.effect = new (this.types[this.effectType]);
+          this.effect.init(this.settings.numLights);  
         }
-        if(!(data.effectType in this.types)){
-          console.warn(`effect effectType ${data.effectType} not found`);
-          return;
+        if('name' in data){
+          this.name = data.name || this.name;
+
         }
-        this.effectType = Object.keys( this.types )[0] || data.effectType;
-        this.effect = new (this.types[this.effectType]);
-        this.effect.init(this.settings.numLights);
-        this.name = data.name || this.name;
         this.effect.setConfig(data);  
         return this;
     }
@@ -76,7 +73,7 @@ module.exports = class {
                 "type":"select",
                 "value":this.effectType,
                 "options":Object.keys(this.types).map((k)=>{
-                    [k,this.types[k].getDescription()];
+                    return [k,this.types[k].getDescription()];
                 })
             }
         ]
