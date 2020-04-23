@@ -16,15 +16,14 @@ const Scroll = require('./effects/scroll');
 const Random = require('./patterns/Random');
 */
 
-const settingsPath = './light-settings.json';
-const settings = new (require('./Settings'))(settingsPath);
-const NUM_LEDS = 576;
-
+const settingsPath = '/boot/light-settings.json';
+const Settings = require('./Settings');
+const settings = new Settings(settingsPath);
 const Lights = require('./Lights');
 const LightingServer = require('./LightServer');
 
-process.chdir(__dirname);
 
+      
 /*
 var effects = [
   new Plain(),
@@ -60,9 +59,9 @@ var effects = [
 
 
 async function main(){
-  
+  process.chdir(path.join(__dirname,'..'));
   await settings.load();
-  const lights = new Lights(settings,NUM_LEDS);
+  const lights = new Lights(settings);
   const server = new LightingServer(settings,lights);
   const externalSwitchPin = 11;
 

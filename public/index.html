@@ -21,14 +21,14 @@
       </div>
     </div>
     <div>
-      <label>Add Effect</label><select id="effectTypesDropdown"></select><button id="createEffect">create</button>
+      <!-- label>Add Effect</label><select id="effectTypesDropdown"></select --><button id="createEffect">create</button>
     </div>
 
   </div>
   <script>
 	var container = document.getElementById("container");
   var selectNode = document.getElementById("effectsDropdown");
-  var effectTypesDropdown = document.getElementById("effectTypesDropdown"); 
+  //var effectTypesDropdown = document.getElementById("effectTypesDropdown"); 
   var effectFields = document.getElementById("effectFields"); 
   var createEffectBtn = document.getElementById("createEffect");
   var effectTypes; 
@@ -48,14 +48,14 @@
       selectNode.onchange = selectEffect;
     }
   };
-  xhttp.open("GET", "/options", true);
+  xhttp.open("GET", "/effects", true);
   xhttp.send();
 
   const selectEffect = function(event){
     let effectIndex = event.target.value;
     console.log();
     var xhttp = new XMLHttpRequest();
-    xhttp.open("GET", "/select?"+encodeQueryData({option:effectIndex}), true);
+    xhttp.open("GET", `/effects/select/${effectIndex}`) //+encodeQueryData({effectIndex}), true)
     xhttp.send();
 
     clearEffectFields();
@@ -69,7 +69,8 @@
   }
 
   const populateEffect = function(effectIndex){
-    fetch("/effect_settings?"+new URLSearchParams({effect:effectIndex}).toString()).then((response)=>{
+    //new URLSearchParams({effectIndex}).toString()
+    fetch(`/effects/settings/${effectIndex}`).then((response)=>{
       if(!response.ok){
         console.error(response.status);
         return false;
@@ -88,7 +89,15 @@
         label.innerText = effectProps.label;
         input.value = effectProps.value;
         input.type = effectProps.type;
-        if(effectProps.type==='color'){
+        if(effectProps.type=="select"){
+          let selectInput = document.createElement("select");
+          for( let option in effectProps.options ){
+            console.log(option);
+
+          }
+          inputContainer.appendChild(label);
+        }
+        else if(effectProps.type==='color'){
           //create multiple elements
           let colorInput = input;
           let whiteInput = document.createElement("input");
@@ -142,6 +151,13 @@
     console.log(effectIndex,id,setting);
   }
 
+  createEffectBtn.addEventListener('click',async function(e){
+    const response = await fetch("/effects/add",{method:"PUT"});
+    const data = await response.json();
+    console.log(data);
+    populateEffect(data.effectIndex);
+  })
+  /*
   fetch("/effect_types").then((response)=>{
     if(!response.ok){
       console.error(response.status);
@@ -162,6 +178,7 @@
     });
     
   });
+  */
 
   
 

@@ -6,7 +6,7 @@ const Color = require('../Color');
 
 module.exports = class {
 	
-	constructor(name, r,g,b,w){
+	constructor(r,g,b,w){
 		this.numPixels;
 		if( r instanceof Color ){
 			this.color = r;
@@ -14,7 +14,7 @@ module.exports = class {
 		else {
 			this.color = new Color(r,g,b,w);
 		}
-		this.name = name || "Off";
+		
 	}
 
 	init(num){
@@ -34,24 +34,18 @@ module.exports = class {
 	}
 
 	setConfig(data){
-    this.name = data.name;
-    this.color = Color.fromString(data.color);
+    	this.name = data.name;
+    	this.color = Color.fromString(data.color);
 	}
 
 	getProperties(){
-		return [
-      {
-        "id":"name",
-        "label":"Name",
-        "type":"text",
-        "value":this.name
-      },
+		return [      
 			{
-        "id":"color",
-        "label":"Color",
-        "type":"color",
-        "value":this.color.toString()
-      }      
+				"id":"color",
+				"label":"Color",
+				"type":"color",
+				"value":this.color.toString()
+      		}      
 		]
 	}
 

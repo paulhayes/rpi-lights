@@ -101,8 +101,11 @@ const Color = module.exports = class {
   }
 
 	static fromString(str){
-    let [ r, g, b, w ] = str.split(',').map(parseFloat);
-    return new Color(r,g,b,w);
+		if(!str){
+			return new Color();
+		}
+		let [ r, g, b, w ] = str.split(',').map(parseFloat);
+		return new Color(r,g,b,w);
 	}
 
 	static lerp(color1,color2,t){

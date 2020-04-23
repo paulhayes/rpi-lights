@@ -5,31 +5,23 @@ const ws281x = require('rpi-ws281x-native');
 const STRIP_TYPE = "sk6812-grbw";
 
 const Color = require('./Color');
-const Plain = require('./effects/plain');
+const Pattern = require('./pattern');
 const Effects = new require('./effects/Effects');
-
-/*
-const effectTypes = {
-    Plain
-};
-effectTypes.entries.forEach(([k,v]=>v.class=k));
-*/
 
 module.exports = class {
 
-    constructor(settings,numLeds){
-        
+    constructor(settings){
+        this.settings = settings;
         const channels = ws281x.init({
             dma: 10,
             freq: 800000,
-            channels: [{gpio: 18, count: numLeds, invert: false, stripType: STRIP_TYPE}]
+            channels: [{gpio: 18, count: settings.numLights, invert: false, stripType: STRIP_TYPE}]
           });
 
         const channel = channels[0];
         this.pixelData = channel.array;
 
         this.effectStack = [];
-        this.numLeds = numLeds;
         
         // ---- trap the SIGINT and reset before exit
         process.on('SIGINT', function() {
@@ -40,7 +32,6 @@ module.exports = class {
         });
 
         this.setData(settings);
-        this.effects.forEach((e)=>e.init(numLeds));
 
     }
 
@@ -77,6 +68,13 @@ module.exports = class {
         }
     }
 
+    addEffect(){
+        let pattern = new Pattern(this.settings);
+        this.effects.push( pattern );
+
+        return pattern;
+    }
+
     pushEffect(){
         if(this.currentEffect!==this.offEffect)
             this.effectStack.push(this.currentEffect);
@@ -99,19 +97,19 @@ module.exports = class {
     getData(){
         return {
             effectIndex:this.currentEffectIndex,
-            effects:this.effects.map((effect)=>Effects.toJson(effect))
+            effects:this.effects.map((effect)=>effect.toJson())
         }
     }
 
     setData(settings){      
-        if(settings.effects) this.effects = settings.effects.map((data)=>Effects.fromJson(data)).filter((e)=>!!e);
+        if(settings.effects) this.effects = settings.effects.map((data)=>new Pattern(this.settings).fromJson(data)).filter((e)=>!!e);
         if(!this.effects || !this.effects.length){
           console.log("no effects found. Creating defaults");
-          const offEffect =new Plain();
+          const offEffect = new Pattern(this.settings,"off","Plain");
         
           this.effects = [
             offEffect,
-            new Plain("white",new Color(0,0,0,1))
+            new Pattern(this.settings,"white","Plain",new Color(0,0,0,1))
           ];
         }
         this.selectEffect( settings.effectIndex );
