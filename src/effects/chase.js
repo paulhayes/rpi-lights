@@ -11,9 +11,9 @@ module.exports = class {
         this.colors;
         this.pos = 0;
         this.speed = speed;
-        this.color1 = color1;
-        this.color2 = color2;
-        this.color3 = color3;
+        this.color1 = color1 || new Color();
+        this.color2 = color2 || new Color();
+        this.color3 = color3 || new Color(); 
         this.length = 50;
         this.tail = 40;
 	}
