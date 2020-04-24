@@ -1,13 +1,19 @@
 "use strict"
 
 const Plain = require('./effects/plain');
+const Wave = require('./effects/wave');
+const Chase = require('./effects/chase');
+const Fire = require('./effects/fire');
 
 module.exports = class {
 
     constructor(settings,name,effectType,...effectArgs){
 
         this.types = {
-            Plain
+            Plain,
+            Wave,
+            Chase,
+            Fire
         }
 
         effectType = effectType || "Plain";

@@ -54,7 +54,7 @@
           <div class="four columns"><label for="${props.id}">${props.label}</label></div>
           <div class="eight columns">
             <select>
-              ${props.options.map((opt)=>`<option value="${opt[0]}">${opt[1]}</option>`)}
+              ${props.options.map((opt)=>`<option value="${opt[0]}" ${props.value===opt[0]?'selected':''}>${opt[1]}</option>`).join("")}
             </select>
           </div>
         </div>
@@ -157,7 +157,9 @@
       }
       const responseData = await response.json();
       console.log(responseData.status);
-      
+      if(property==='effectType'){
+        populateEffect(effectIndex);
+      }
     }
   
     const populateEffect = async function(effectIndex){

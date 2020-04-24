@@ -1,49 +1,108 @@
 "use strict";
 
 const Color = require('../Color');
-
-//const color = new Color(0,0,0,200);
+const { wrap } = require('./effect-utils');
 
 module.exports = class {
 	
-	constructor(name, color1, color2, width){
-		this.color1 = color1;
-		this.color2 = color2;
-		this.name = name || "Wave";
+	constructor(color1, color2, width, speed){
+		this.color1 = color1 || new Color(1,0,0,0);
+		this.color2 = color2 || new Color(0,1,0,0);
 		this.offset = 0;
-		this.width = width;
+		this.width = width || 5;
+		this.speed = speed || 1;
 	}
 
 	init(num){
-		this.numPixels = num;
-		this.values = new Float32Array(this.numPixels);
-		this.width = this.width || this.numPixels;
-				
+		this.numLights = num;
+		const values = new Float32Array(this.numLights);
+		this.width = this.width || this.numLights;
+		
 		for(let i=0;i<num;i++){
-			this.values[i] = 0.5+0.5*Math.sin((i/(this.width)+Math.round(this.offset))/(2*Math.PI));
+			values[i] = 0.5+0.5*Math.cos((i/this.width)*(2*Math.PI));
 		}
-
-		this.colors = Array.from(this.values,c=>Color.lerp(this.color1,this.color2,c) );
+		
+		this.colors = Array.from(values,c=>Color.lerp(this.color1,this.color2,c) );
+		
 	}
 
-	update(pixels){
+	update(pixels){			
+		let num = this.numLights;
 		
-		
-		let num = this.numPixels;
-		let last = this.colors[this.wrap(-1)];
+		let speed = Math.round(-this.speed);
+		let dir = speed/Math.abs(speed);
 		for(let i=0;i<num;i++){
-			let tmp = this.colors[i];
-			this.colors[i] = last;
-			last = tmp;
+			let pos = (dir==1?i:num-i);
+			let j = wrap(pos,num);
+			let k = wrap(pos+speed,num);
+			
+			this.colors[j] = this.colors[k];
 		}
 		
 		Color.toIntArray(this.colors, pixels);
 	}
 
-	wrap(index){
-		while( index < 0 ){
-			index+=this.numPixels;
+	getConfig(){
+		return {
+			"color1":this.color1.toString(),
+			"color2":this.color2.toString(),
+			"width":this.width,
+			"speed":this.speed
 		}
-		return index % this.numPixels;
 	}
+
+	setConfig(data){
+		if('color1' in data){
+			this.color1 = Color.fromString(data.color1);
+		}
+		if('color2' in data){
+			this.color2 = Color.fromString(data.color2);
+		}
+		if('width' in data){
+			this.width = data.width;
+		}
+		if('speed' in data){
+			this.speed = data.speed;
+		}
+		this.init(this.numLights);
+	}
+
+	getProperties(){
+		return [      
+			{
+				"id":"color1",
+				"label":"Color 1",
+				"type":"color",
+				"value":this.color1.toString(),
+			},
+			{
+				"id":"color2",
+				"label":"Color 2",
+				"type":"color",
+				"value":this.color2.toString()
+			},
+			{
+				"id":"width",
+				"label":"Width",
+				"type":"number",
+				"min":0,
+				"max":this.numLights,
+				"value":this.width	
+			},
+			{
+				"id":"speed",
+				"label":"Speed",
+				"type":"number",
+				"min":-10,
+				"max":10,
+				"value":this.speed	
+			}
+		]
+	}
+
+	static getDescription(){
+		return "Wave";
+	}
+
+	
 };
