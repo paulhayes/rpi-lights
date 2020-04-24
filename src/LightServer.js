@@ -29,8 +29,19 @@ module.exports = class {
             res.json({error : "request missing required property"});
           }          
         });
+
+        server.delete('/effects/:effectIndex',(req,res)=>{
+          let effectIndex = getParamInt(req.params,"effectIndex");
+          if(effectIndex>=0 && effectIndex<lights.effects.length){
+            lights.deleteEffect(effectIndex);
+            res.json({'status':'ok'});
+          }
+          else {
+            res.json({'status':'error','message':'out of range'});            
+          }
+        });
         
-        server.put('/effects/add',function(req,res){
+        server.post('/effects',function(req,res){
           let effectCreated = lights.addEffect();
           lights.selectEffect(lights.effects.length-1); 
           lights.save();
@@ -50,14 +61,12 @@ module.exports = class {
             res.json("Missing property effectIndex");
             return;
           }
-          console.log(effectIndex);
           lights.selectEffect(effectIndex);
           res.json(lights.effects[effectIndex].getProperties());  
       });
 
         server.put('/effects/settings/:effectIndex',function(req,res){
           let effectIndex = getParamInt(req.params,"effectIndex");
-          console.log(req.body);
           if(effectIndex===false){
             res.statusCode = 401;
             res.json("Missing property effectIndex");

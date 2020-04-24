@@ -94,6 +94,16 @@ module.exports = class {
           }
     }
 
+    deleteEffect(effectIndex){
+        if( effectIndex >= 0 && effectIndex < this.effects.length ){
+            let selectedEffect = this.currentEffectIndex;
+            this.effects.splice(effectIndex,1);
+            if(selectedEffect>=effectIndex)
+                this.currentEffect = this.effects[--selectedEffect];
+        }
+
+    }
+
     getData(){
         return {
             effectIndex:this.currentEffectIndex,

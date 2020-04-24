@@ -33,10 +33,9 @@ module.exports = class {
 	}
 
 	setConfig(data){
-    if('color' in data){
-      console.log("setting color");
-    	this.color = Color.fromString(data.color);
-    }
+		if('color' in data){
+			this.color = Color.fromString(data.color);
+		}
 	}
 
 	getProperties(){
