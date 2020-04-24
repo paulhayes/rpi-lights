@@ -2,221 +2,39 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width">
+  <meta name="viewport" content="width=device-width">  
   <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/skeleton.css">
   <link rel="stylesheet" href="style.css">
   <script src="jscolor.js"></script>
   <title>Lights</title>
 </head>
 <body>
-  <div id="container">
-    <div>
-      <label>Select Effect</label>
-      <select id="effectsDropdown"></select>
-    </div>
-    <div>
-      <label>Edit Effect</label>
-      <div id="effectFields">
-        
+  <div class="container">
+    <div class="row">
+      <div class="two columns">      
+        <label>Select Effect</label>
+      </div>
+      <div class="four columns">
+          <select id="effectsDropdown"></select>
+      </div>
+      <div class="six columns">
+        <button id="createEffect">create new</button>
       </div>
     </div>
-    <div>
-      <!-- label>Add Effect</label><select id="effectTypesDropdown"></select --><button id="createEffect">create</button>
+    <div class="row line">
+      <label>Edit Effect</label>
     </div>
-
-  </div>
-  <script>
-	var container = document.getElementById("container");
-  var selectNode = document.getElementById("effectsDropdown");
-  //var effectTypesDropdown = document.getElementById("effectTypesDropdown"); 
-  var effectFields = document.getElementById("effectFields"); 
-  var createEffectBtn = document.getElementById("createEffect");
-  var effectTypes; 
-
-	var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      var data = JSON.parse(this.responseText);
-      var options = data.effects;
-      options.forEach(function(option, index){
-        var op = new Option();
-      op.value = index;
-      op.text = option;
-      selectNode.options.add(op);
-      });
-      let selectedEffectIndex = parseInt(data.selected);
-      if(selectedEffectIndex>=0){
-        selectNode.value = data.selected;
-        selectNode.onchange = selectEffect;
-        populateEffect(selectedEffectIndex);
-      }
-    }
-  };
-  xhttp.open("GET", "/effects", true);
-  xhttp.send();
-
-  const selectEffect = function(event){
-    let effectIndex = event.target.value;
-    console.log();
-    var xhttp = new XMLHttpRequest();
-    xhttp.open("GET", `/effects/select/${effectIndex}`) //+encodeQueryData({effectIndex}), true)
-    xhttp.send();
-
-    clearEffectFields();
-    populateEffect(effectIndex);
-  }
-
-  const clearEffectFields = function(){
-    while(effectFields.childElementCount>0){
-      effectFields.removeChild(effectFields.lastElementChild)
-    }
-  }
-
-  const sendProperty = async function(effectIndex,property,value){
-    const data = {};
-    data[property] = value;
-    const response = await fetch(`/effects/settings/${effectIndex}`,{
-      method:"PUT",
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body:JSON.stringify(data)
-    });
-    if( response.status !== 200 ){
-      console.warn(response.status,response.error);
-      return;
-    }
-    const responseData = await response.json();
-    console.log(data);
-  }
-
-  const populateEffect = function(effectIndex){
-    //new URLSearchParams({effectIndex}).toString()
-    fetch(`/effects/settings/${effectIndex}`).then((response)=>{
-      if(!response.ok){
-        console.error(response.status);
-        return false;
-      }
-      return response.json();
-    }).then(function(data){
-      if(!data)
-        return;
-      console.log(data);
-      let inputElements = [];
-      data.forEach((effectProps,i)=>{
-        console.log(effectProps,i);        
-        let inputContainer = document.createElement("div");
-        let input = document.createElement("input");
-        let label = document.createElement("label");
-        label.innerText = effectProps.label;
-        input.value = effectProps.value;
-        input.type = effectProps.type;
-        if(effectProps.type==='select'){
-          let selectInput = document.createElement("select");
-          
-          for( let option of effectProps.options ){
-            let optionElement = document.createElement("option");
-            console.log(option);
-            optionElement.innerText = option[1];
-            optionElement.value = option[0];
-            selectInput.appendChild(optionElement);
-          }
-          inputContainer.appendChild(label);
-          inputContainer.appendChild(selectInput);
-          selectInput.onchange = function(){
-            sendProperty(effectIndex,effectProps.id,selectInput.value);
-          };
-          
-        }
-        else if(effectProps.type==='color'){
-          //create multiple elements
-          let colorInput = input;
-          let whiteInput = document.createElement("input");
-          let rgb = "#"+effectProps.value.split(",").slice(0,3).map((g)=>Math.round(parseFloat(g)*0xff).toString(16)).map((d)=>"00".slice(0,2-d.length)+d ).join("");
-          let w = effectProps.value.split(",").slice(-1);
-          console.log("color data:",effectProps.value,rgb,w);
-          whiteInput.type = "range";
-          whiteInput.min = 0;
-          whiteInput.max = 1;
-          whiteInput.step = 0.01;
-          whiteInput.value = parseFloat(w);
-          colorInput.value = rgb;
-          let onInput = function(){
-            console.log('input',colorInput.value.substr(1,2),whiteInput.value);
-            let bytePositions = [1,3,5];
-            let colorStr = bytePositions.map((p)=>(parseInt(colorInput.value.substr(p,2),16)/255).toFixed(2) ).join(',');
-            
-            colorStr += ','+parseFloat(whiteInput.value).toFixed(2);
-            sendProperty( effectIndex, effectProps.id, colorStr);
-          }
-          whiteInput.oninput = onInput;
-          colorInput.oninput = onInput;
-          inputElements.push([effectProps.id,input]);
-          inputContainer.appendChild(label);
-          inputContainer.appendChild(colorInput);
-          inputContainer.appendChild(whiteInput);
-        }
-        else {
-          input.onchange = function(){
-          //console.log('change');
-          }
-          input.oninput = function(){
-            console.log('input');
-            let value = input.value;
-            if(effectProps.type==='number' || effectProps.type==='range'){
-              value = parseFloat(value);
-            }
-            sendProperty( effectIndex, effectProps.id, input.value );
-          }
-          inputElements.push([effectProps.id,input]);
-          inputContainer.appendChild(label);
-          inputContainer.appendChild(input);
-        }
-        effectFields.appendChild(inputContainer);
-      });
-    });
-  }
-
-  createEffectBtn.addEventListener('click',async function(e){
-    const response = await fetch("/effects/add",{
-      method:"PUT",
-    });
-    const data = await response.json();
-    console.log(data);
-    populateEffect(data.effectIndex);
-  })
-  /*
-  fetch("/effect_types").then((response)=>{
-    if(!response.ok){
-      console.error(response.status);
-      return;
-    }
-    return response.json()
-  }).then(function(data){
-    if(!data)
-      return;
-    console.log(data);
-    effectTypes = data;
-    Object.keys( effectTypes ).forEach((effectName,i)=>{
-      console.log(effectName,i);
-      let option = document.createElement("option");
-      option.value = i;
-      option.innerText = effectName;
-      effectTypesDropdown.appendChild(option);
-    });
+    <div id="effectFields">
+        
+    </div>
     
-  });
-  */
+    <div class="row">
+      
+    </div>
+  </div>
 
-  
-
-  function encodeQueryData(data) {
-   let ret = [];
-   for (let d in data)
-     ret.push(encodeURIComponent(d) + '=' + encodeURIComponent(data[d]));
-   return ret.join('&');
-}
-
-  </script>
+  <script src="/site.js"></script>
 </body>
 </html>

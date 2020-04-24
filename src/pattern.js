@@ -69,7 +69,7 @@ module.exports = class {
             },
             {
                 "id":"effectType",
-                "label":"type",
+                "label":"Type",
                 "type":"select",
                 "value":this.effectType,
                 "options":Object.keys(this.types).map((k)=>{
