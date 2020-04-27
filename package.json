@@ -1,16 +1,20 @@
 {
   "name": "lights",
   "version": "1.0.0",
-  "main": "lights.js",
+  "main": "src/main.js",
   "dependencies": {
+    "express": "^4.17.1",
     "onoff": "^1.2.0",
     "parse-png": "^1.1.2",
     "rpi-ws281x-native": "github:paulhayes/node-rpi-ws281x-native#v1.x",
     "rpio": "^2.1.1"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "nodemon": "^2.0.3"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "sudo npx nodemon --watch src ."
   },
   "author": "",
   "license": "ISC",
@@ -19,7 +23,7 @@
     "ignore": [
       "test/*",
       "docs/*",
-      "settings.json"
+      "light-settings.json"
     ],
     "delay": "1000"
   }

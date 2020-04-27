@@ -7,7 +7,7 @@ let randomRange = function(start,end){
 }
 
 module.exports = class {
-    
+  
 	constructor(name){
         
         this.name = name;

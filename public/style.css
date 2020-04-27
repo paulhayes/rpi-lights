@@ -1,0 +1,21 @@
+body {
+  font-family:system-ui;
+}
+
+.line {
+  border-top: 1px solid #eee;
+}
+
+input[type=color],
+input[type=range], 
+input[type=text] {
+  width:100%;
+}
+
+#createEffect {
+  width:100%
+}
+
+select#effectsDropdown {
+  width:100%;
+}

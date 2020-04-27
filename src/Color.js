@@ -4,7 +4,7 @@ let toByte = function(channel){
 	return Math.floor(0xff*Math.min(1,Math.max(channel,0))) & 0xff;
 }
 
-let Color = module.exports = class {
+const Color = module.exports = class {
 
 	constructor(r,g,b,w){
 		this.r = r || 0;
@@ -66,7 +66,7 @@ let Color = module.exports = class {
 	}
 
 	toInt(){
-		var col = this.balance(1,0.725,0.7,1).gamma(1.5);
+		var col = this.balance(1,0.725,0.7,1).gamma();
 		return toByte(col.w)<<24 | toByte(col.r)<<16 | toByte(col.g)<<8 | toByte(col.b);
 	}
 
@@ -80,7 +80,7 @@ let Color = module.exports = class {
 	}
 
 	gamma(vr,vg,vb,vw){
-		vr = vr || 1.5;
+		vr = vr || Color.gamma;
 		vg = vg || vr;
 		vb = vb || vg;
 		vw = vw || vb;
@@ -90,7 +90,23 @@ let Color = module.exports = class {
     
     clone(){
         return new Color(this.r,this.g,this.b,this.w);
-    }
+	}
+	
+	toString(){
+		return `${this.r},${this.g},${this.b},${this.w}`;
+  }
+  
+  toHex(){
+    return `#${toByte(this.r)}${toByte(this.g)}${toByte(this.b)}`;
+  }
+
+	static fromString(str){
+		if(!str){
+			return new Color();
+		}
+		let [ r, g, b, w ] = str.split(',').map(parseFloat);
+		return new Color(r,g,b,w);
+	}
 
 	static lerp(color1,color2,t){
 		t=Math.min(1,Math.max(0,t));
@@ -98,8 +114,11 @@ let Color = module.exports = class {
 	}
 
 	static toIntArray(colorArray, intArray){
-		for(let i=0;i<colorArray.length;i++){
-			intArray[i] = colorArray[i].toInt();
+		if(colorArray instanceof Color){
+			colorArray = [colorArray];
+		}
+		for(let i=0;i<intArray.length;i++){
+			intArray[i] = colorArray[i%colorArray.length].toInt();
 		}
 	}
 
@@ -117,8 +136,11 @@ let Color = module.exports = class {
     static createArray(length, color){
         color = color || new Color(0,0,0);
         return new Array(length).fill(color);
-    }
+	}
+	
+	 
 
 }
 
 Color.black = new Color(0,0,0,0);
+Color.gamma = 1.25;
