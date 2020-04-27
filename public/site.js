@@ -1,9 +1,10 @@
+"use strict";
 
 	var container = document.querySelector(".container");
-    var selectNode = document.getElementById("effectsDropdown");
-    var effectFields = document.getElementById("effectFields"); 
-    var createEffectBtn = document.getElementById("createEffect");
-    var effectTypes; 
+  var selectNode = document.getElementById("effectsDropdown");
+  var effectFields = document.getElementById("effectFields"); 
+  var createEffectBtn = document.getElementById("createEffect");
+  var effectTypes; 
   
     const updateEffectsList = async function(){
       const response = await fetch( "/effects");
@@ -17,7 +18,7 @@
       }
       var options = data.effects;
         options.forEach(function(option, index){
-          var op = new Option();
+        var op = new Option();
         op.value = index;
         op.text = option;
         selectNode.options.add(op);
@@ -75,12 +76,15 @@
         </div>
       `);
       const input = row.querySelector("input");
+      for(let propKey in props){
+        input[propKey] = props[propKey];
+      }
       input.oninput = function(){
         let value = input.value;
         if(props.type==='number' || props.type==='range'){
           value = parseFloat(value);
         }
-        sendProperty( effectIndex, props.id, input.value );
+        sendProperty( effectIndex, props.id, value );
       }
 
       return row;
@@ -111,6 +115,24 @@
         const data = await response.json();
         updateEffectsList();
       });
+    }
+
+    const createTextArea = function(effectIndex,props){
+      const row = makeHTML(`
+        <div class="row" >
+          <label for="${props.id}">${props.label}</label>
+          <textarea name="${props.id}" cols=80 rows=40>${props.value}</textarea>
+        </div>
+      `);
+
+      const input = row.querySelector('textarea');
+      input.oninput = function(){
+        let value = input.value;
+        
+        sendProperty( effectIndex, props.id, value );
+      }
+
+      return row;
     }
 
     const createColorInput = function(effectIndex,props){
@@ -156,7 +178,6 @@
         return;
       }
       const responseData = await response.json();
-      console.log(responseData.status);
       if(property==='effectType'){
         populateEffect(effectIndex);
       }
@@ -175,7 +196,7 @@
         return;
       clearEffectFields();
       data.forEach((effectProps,i)=>{
-        console.log(effectProps,i);    
+        //console.log(effectProps,i);    
         let inputContainer = document.createElement("div");
         inputContainer.className = "row";
         
@@ -183,16 +204,16 @@
         label.innerText = effectProps.label;
         
         if(effectProps.type==='select'){
-          inputContainer.appendChild( createDropdownInput(effectIndex,effectProps) );
-         
+          inputContainer.appendChild( createDropdownInput(effectIndex,effectProps) );         
+        }
+        else if(effectProps.type==='textarea'){
+          inputContainer.appendChild( createTextArea(effectIndex,effectProps) );
         }
         else if(effectProps.type==='color'){
-          inputContainer.appendChild( createColorInput(effectIndex,effectProps) );            
-          
+          inputContainer.appendChild( createColorInput(effectIndex,effectProps) );          
         }
         else {
           inputContainer.appendChild( createGenericInput(effectIndex,effectProps) );
-          
         }
 
         effectFields.appendChild(inputContainer);
@@ -205,12 +226,15 @@
     createEffectBtn.addEventListener('click',async function(e){
       const response = await fetch("/effects",{
         method:"POST",
-      });
+      });      
+      if(response.status!==200){
+        console.warn(response.status);
+        return;
+      }
       const data = await response.json();
-      console.log(data);
       updateEffectsList();
       populateEffect(data.effectIndex);
-    })
+    });
    
   
   function encodeQueryData(data) {

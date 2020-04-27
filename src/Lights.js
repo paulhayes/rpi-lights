@@ -6,16 +6,16 @@ const STRIP_TYPE = "sk6812-grbw";
 
 const Color = require('./Color');
 const Pattern = require('./pattern');
-const Effects = new require('./effects/Effects');
 
 module.exports = class {
 
     constructor(settings){
         this.settings = settings;
+        settings.stripType = settings.stripType || STRIP_TYPE;
         const channels = ws281x.init({
             dma: 10,
             freq: 800000,
-            channels: [{gpio: 18, count: settings.numLights, invert: false, stripType: STRIP_TYPE}]
+            channels: [{gpio: 18, count: settings.numLights, invert: false, stripType:settings.stripType}]
           });
 
         const channel = channels[0];

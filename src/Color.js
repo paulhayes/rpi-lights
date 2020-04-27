@@ -66,7 +66,7 @@ const Color = module.exports = class {
 	}
 
 	toInt(){
-		var col = this.balance(1,0.725,0.7,1).gamma(1.5);
+		var col = this.balance(1,0.725,0.7,1).gamma();
 		return toByte(col.w)<<24 | toByte(col.r)<<16 | toByte(col.g)<<8 | toByte(col.b);
 	}
 
@@ -80,7 +80,7 @@ const Color = module.exports = class {
 	}
 
 	gamma(vr,vg,vb,vw){
-		vr = vr || 1.5;
+		vr = vr || Color.gamma;
 		vg = vg || vr;
 		vb = vb || vg;
 		vw = vw || vb;
@@ -143,3 +143,4 @@ const Color = module.exports = class {
 }
 
 Color.black = new Color(0,0,0,0);
+Color.gamma = 1.25;

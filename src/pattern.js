@@ -4,6 +4,9 @@ const Plain = require('./effects/plain');
 const Wave = require('./effects/wave');
 const Chase = require('./effects/chase');
 const Fire = require('./effects/fire');
+const Custom = require('./effects/custom');
+
+const Gamma = require('./effects/gamma-test');
 
 module.exports = class {
 

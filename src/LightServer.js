@@ -47,12 +47,6 @@ module.exports = class {
           lights.save();
           return res.json({effectIndex:lights.currentEffectIndex});          
         });
-        
-        /*
-        server.get('/effect_types',function(req,res){
-          res.json(Object.keys(Effects.types));
-        });
-        */
 
         server.get('/effects/settings/:effectIndex',function(req,res){
           let effectIndex = getParamInt(req.params,"effectIndex");

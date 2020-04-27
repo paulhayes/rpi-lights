@@ -2,8 +2,6 @@
 
 const Color = require('../Color');
 
-//const color = new Color(0,0,0,200);
-
 module.exports = class {
 	
 	constructor(r,g,b,w){

@@ -2,13 +2,18 @@
 
 const Color = require('../Color');
 
-//const color = new Color(0,0,0,200);
+const PropertyParser = require('./property-parser');
 
 module.exports = class {
 	
 	constructor(name, numerator, demoninator){
-		this.numPixels;
+        const propertyParser = new PropertyParser(this);
+        this.propertyParser = propertyParser;
+        propertyParser.addRange('gamma','Gamma',0,2,0.01);
+        propertyParser.addInt('dem','brightness fraction',1,20);
+        this.numPixels;
         this.colors;
+        this.gamma = 1.5;
         this.num = numerator || 1;
         this.dem = demoninator || 2;
 		this.name = name || "Gamma Test";
@@ -34,7 +39,6 @@ module.exports = class {
                 let c = cols[i].mul(this.num/this.dem);
                 if( j>(band/2) ){
                     c = ((index%this.dem)<this.num) ? cols[i] : Color.black;
-
                 }
                 this.colors[index] = c;
             }
@@ -42,6 +46,28 @@ module.exports = class {
 	}
 
 	update(pixels){
+        Color.gamma = this.gamma;        
 		Color.toIntArray(this.colors, pixels);
+    }
+    
+    
+	getConfig(){
+		return this.propertyParser.toJson();
+		
+	}
+
+	setConfig(data){
+		this.propertyParser.fromJson(data);
+		
+		this.init(this.numPixels);
+	}
+
+	getProperties(){
+		return this.propertyParser.getProperties();
+		
+	}
+
+	static getDescription(){
+		return "Gamma Test";
 	}
 };
