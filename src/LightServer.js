@@ -1,6 +1,9 @@
 'use strict';
 
 const express = require('express');
+const https = require('https');
+const http = require('http');
+const fs = require('fs');
 const { getParamInt } = require('../src/http-utils');
 
 module.exports = class {
@@ -23,6 +26,10 @@ module.exports = class {
           let effectId = req.params.effectId;
           if(effectId){
             lights.selectEffect(effectId);
+            if(req.header('Accept').split(',').indexOf('text/html')==0){
+              res.statusCode = 303;
+              res.header('Location','/');  
+            }
             res.end( JSON.stringify({status:'okay'}) );
             lights.save();
           }
@@ -79,9 +86,17 @@ module.exports = class {
            
         })
                
-        server.listen(80);
-
-       
+        if( fs.existsSync('ssl/server.key') ){
+          console.log("starting https");
+          const config = {
+            key: fs.readFileSync('ssl/server.key','utf8'),
+            cert: fs.readFileSync('ssl/server.cert','utf8'),
+          };
+          https.createServer(config,server).listen(443);
+  
+        }
+        console.log("starting http");
+        http.createServer(server).listen(80);
     }
       
 }

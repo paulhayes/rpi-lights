@@ -68,3 +68,10 @@ node /home/lights/workspace/rpi-lights/lights.js < /dev/null &
 ### Make read only
 - Use the following instructions https://github.com/ways/rpi-readonly
 
+### Modify code / Make Changes
+
+- stop the exisiting service ```sudo killall node```
+- switch to read-write mode ```rw```
+- from the rpi-lights dir run: ```npm run dev```
+
+This will create a autoretarting service, if code is changes the service will reboot.

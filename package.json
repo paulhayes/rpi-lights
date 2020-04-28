@@ -15,7 +15,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "sudo npx nodemon --watch src ."
+    "dev": "sudo npx nodemon --watch src .",
+    "create-key":"mkdir ssl && openssl req -nodes -new -x509 -keyout ssl/server.key -out ssl/server.cert"
   },
   "author": "",
   "license": "ISC",
