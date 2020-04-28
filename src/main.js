@@ -69,12 +69,12 @@ async function main(){
 
   function onExternalSwitchChange(pin){
     let isOn = rpio.read(pin) === rpio.LOW;
-    if(isOn ){
-      lights.popEffect();
+    if( isOn ){
+      lights.selectLast();
     }
-    else if(!isOn){
-      lights.pushEffect();
-      lights.selectEffect(0);
+    else {
+      lights.storeLast();
+      lights.selectOff();
     }
   }
   

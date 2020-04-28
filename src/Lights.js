@@ -79,12 +79,12 @@ module.exports = class {
         return id;
     }
 
-    pushEffect(){
+    storeLast(){
         if(this.currentEffect!==this.offEffect)
             this.lastEffect = this.currentEffect;
     }
     
-    popEffect(){
+    selectLast(){
         if(this.lastEffect!==null)
             this.currentEffectId = this.lastEffect;
     }
@@ -93,7 +93,7 @@ module.exports = class {
         
         if( effectId in this.effects ){
             if(effectId === offEffectId){
-                this.pushEffect();
+                this.storeLast();
             }
             this.currentEffectId = effectId;
             return effectId;
@@ -102,6 +102,10 @@ module.exports = class {
             console.warn(`Effect with id ${effectId} not found`);
         }
         return null;
+    }
+
+    selectOff(){
+        this.selectEffect(offEffectId);
     }
 
     hasEffect(effectId){
