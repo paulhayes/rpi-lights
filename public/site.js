@@ -17,17 +17,17 @@
         selectNode.removeChild(selectNode.lastElementChild);
       }
       var options = data.effects;
-        options.forEach(function(option, index){
+        Object.entries(options).forEach(function([effectId,effectName]){
         var op = new Option();
-        op.value = index;
-        op.text = option;
+        op.value = effectId;
+        op.text = effectName;
         selectNode.options.add(op);
         });
-        let selectedEffectIndex = parseInt(data.selected);
-        if(selectedEffectIndex>=0){
+        let selectedEffectId = data.selected;
+        if(selectedEffectId in options){
           selectNode.value = data.selected;
           selectNode.onchange = selectEffect;
-          populateEffect(selectedEffectIndex);
+          populateEffectEdit(selectedEffectId);
         }
     }
 
@@ -40,7 +40,7 @@
       let effectIndex = event.target.value;
       const response = await fetch(`/effects/select/${effectIndex}`);
       
-      populateEffect(effectIndex);
+      populateEffectEdit(effectIndex);
     }
   
     const clearEffectFields = function(){
@@ -160,13 +160,13 @@
         return row;
     }
   
-    const sendProperty = async function(effectIndex,property,value){
+    const sendProperty = async function(effectId,property,value){
       const data = {};
       if(property==='name'){
-        selectNode.childNodes[effectIndex].innerText = value;
+        selectNode.querySelector(`option[value="${effectId}"]`).innerText = value;
       }
       data[property] = value;
-      const response = await fetch(`/effects/settings/${effectIndex}`,{
+      const response = await fetch(`/effects/settings/${effectId}`,{
         method:"PUT",
         headers: {
           'Content-Type': 'application/json'
@@ -179,12 +179,12 @@
       }
       const responseData = await response.json();
       if(property==='effectType'){
-        populateEffect(effectIndex);
+        populateEffectEdit(effectId);
       }
     }
   
-    const populateEffect = async function(effectIndex){
-      const response = await fetch(`/effects/settings/${effectIndex}`);
+    const populateEffectEdit = async function(effectId){
+      const response = await fetch(`/effects/settings/${effectId}`);
         if(!response.ok){
           console.error(response.status);
           return false;
@@ -204,21 +204,22 @@
         label.innerText = effectProps.label;
         
         if(effectProps.type==='select'){
-          inputContainer.appendChild( createDropdownInput(effectIndex,effectProps) );         
+          inputContainer.appendChild( createDropdownInput(effectId,effectProps) );         
         }
         else if(effectProps.type==='textarea'){
-          inputContainer.appendChild( createTextArea(effectIndex,effectProps) );
+          inputContainer.appendChild( createTextArea(effectId,effectProps) );
         }
         else if(effectProps.type==='color'){
-          inputContainer.appendChild( createColorInput(effectIndex,effectProps) );          
+          inputContainer.appendChild( createColorInput(effectId,effectProps) );          
         }
         else {
-          inputContainer.appendChild( createGenericInput(effectIndex,effectProps) );
+          inputContainer.appendChild( createGenericInput(effectId,effectProps) );
         }
 
         effectFields.appendChild(inputContainer);
       });
-      effectFields.appendChild( createDeleteButton(effectIndex) );
+      if(effectId!=='off')
+        effectFields.appendChild( createDeleteButton(effectId) );
 
       
     }
@@ -233,7 +234,7 @@
       }
       const data = await response.json();
       updateEffectsList();
-      populateEffect(data.effectIndex);
+      populateEffectEdit(data.effectId);
     });
    
   

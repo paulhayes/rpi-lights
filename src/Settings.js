@@ -6,7 +6,6 @@ module.exports = class {
     constructor(path){
       _path = path;
       this.numLights = 576;
-      this.effectIndex = 0;
       this.effects = [];
     }
     

@@ -13,14 +13,16 @@ module.exports = class {
         server.use(express.json())
         server.get('/effects',(req,res)=>{
           res.statusCode = 200;
-          let effectIndex = Math.max(0, lights.currentEffectIndex);
-          res.json( { effects:lights.effects.map(e=>e.name), selected:effectIndex } );
+          let effectId = lights.currentEffectId;
+          let effects = {};
+          Object.keys(lights.effects).forEach(k=>{effects[k]=lights.effects[k].name});
+          res.json( { effects, selected:effectId } );
         });
         
-        server.get('/effects/select/:effectIndex',(req,res)=>{
-          let effectIndex = getParamInt(req.params,"effectIndex");
-          if(effectIndex!==false){
-            lights.selectEffect(effectIndex);
+        server.get('/effects/select/:effectId',(req,res)=>{
+          let effectId = req.params.effectId;
+          if(effectId){
+            lights.selectEffect(effectId);
             res.end( JSON.stringify({status:'okay'}) );
             lights.save();
           }
@@ -30,10 +32,10 @@ module.exports = class {
           }          
         });
 
-        server.delete('/effects/:effectIndex',(req,res)=>{
-          let effectIndex = getParamInt(req.params,"effectIndex");
-          if(effectIndex>=0 && effectIndex<lights.effects.length){
-            lights.deleteEffect(effectIndex);
+        server.delete('/effects/:effectId',(req,res)=>{
+          let effectId = req.params.effectId;
+          if(lights.hasEffect(effectId)){
+            lights.deleteEffect(effectId);
             res.json({'status':'ok'});
           }
           else {
@@ -42,32 +44,32 @@ module.exports = class {
         });
         
         server.post('/effects',function(req,res){
-          let effectCreated = lights.addEffect();
-          lights.selectEffect(lights.effects.length-1); 
+          let effectCreatedId = lights.addEffect();
+          lights.selectEffect(effectCreatedId); 
           lights.save();
-          return res.json({effectIndex:lights.currentEffectIndex});          
+          return res.json({effectId:effectCreatedId});          
         });
 
-        server.get('/effects/settings/:effectIndex',function(req,res){
-          let effectIndex = getParamInt(req.params,"effectIndex");
-          if(effectIndex===false){
+        server.get('/effects/settings/:effectId',function(req,res){
+          let effectId = req.params.effectId;
+          if(!effectId){
             res.statusCode = 401;
-            res.json("Missing property effectIndex");
+            res.json("Missing property effectId");
             return;
           }
-          lights.selectEffect(effectIndex);
-          res.json(lights.effects[effectIndex].getProperties());  
+          lights.selectEffect(effectId);
+          res.json(lights.effects[effectId].getProperties());  
       });
 
-        server.put('/effects/settings/:effectIndex',function(req,res){
-          let effectIndex = getParamInt(req.params,"effectIndex");
-          if(effectIndex===false){
+        server.put('/effects/settings/:effectId',function(req,res){
+          let effectId = req.params.effectId;
+          if(!effectId){
             res.statusCode = 401;
-            res.json("Missing property effectIndex");
+            res.json("Missing property effectId");
             return;
           }
-          lights.effects[effectIndex].fromJson(req.body);
-          //lights.setProperties(effectIndex,);
+          lights.effects[effectId].fromJson(req.body);
+          //lights.setProperties(effectId,);
           res.json({status:"ok"});
           lights.save();
         });
@@ -81,23 +83,5 @@ module.exports = class {
 
        
     }
-
-    listEffects(req,res){
-      
-    }
-      
-
-      
-      getEffectConfig(effectIndex){
-      
-      }
-      
-      setEffectConfig(effectIndex,configStr){
-      
-      }
-      
-      listEffectTypes(res){
-        
-      }
       
 }

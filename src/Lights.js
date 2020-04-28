@@ -6,6 +6,9 @@ const STRIP_TYPE = "sk6812-grbw";
 
 const Color = require('./Color');
 const Pattern = require('./pattern');
+const uid = require('uid');
+
+const offEffectId = 'off';
 
 module.exports = class {
 
@@ -21,7 +24,7 @@ module.exports = class {
         const channel = channels[0];
         this.pixelData = channel.array;
         this.lastTime = Date.now();
-        this.effectStack = [];
+        this.lastEffect = null;
         
         // ---- trap the SIGINT and reset before exit
         process.on('SIGINT', function() {
@@ -35,8 +38,8 @@ module.exports = class {
 
     }
 
-    get currentEffectIndex(){
-        return this.effects.indexOf(this.currentEffect);
+    get currentEffect(){
+        return this.effects[this.currentEffectId];
     }
 
     run(){
@@ -51,7 +54,7 @@ module.exports = class {
         let time = Date.now();
         let deltaTime = ( time - this.lastTime ) /1000;
         this.lastTime = time;
-      
+        
         if( this.currentEffect != null ){
           this.currentEffect.update(this.pixelData,deltaTime);
         }
@@ -70,59 +73,97 @@ module.exports = class {
 
     addEffect(){
         let pattern = new Pattern(this.settings);
-        this.effects.push( pattern );
+        let id  = uid();
+        this.effects[id] = pattern;
 
-        return pattern;
+        return id;
     }
 
     pushEffect(){
         if(this.currentEffect!==this.offEffect)
-            this.effectStack.push(this.currentEffect);
+            this.lastEffect = this.currentEffect;
     }
     
     popEffect(){
-        if(this.effectStack.length)
-            this.currentEffect = this.effectStack.pop();
+        if(this.lastEffect!==null)
+            this.currentEffectId = this.lastEffect;
     }
 
-    selectEffect(effectIndex){
-        if(effectIndex===0){
-          this.pushEffect();
+    selectEffect(effectId){
+        
+        if( effectId in this.effects ){
+            if(effectId === offEffectId){
+                this.pushEffect();
+            }
+            this.currentEffectId = effectId;
+            return effectId;
         }
-        if( effectIndex >= 0 && effectIndex < this.effects.length ){
-            this.currentEffect = this.effects[effectIndex];
-          }
+        else {
+            console.warn(`Effect with id ${effectId} not found`);
+        }
+        return null;
     }
 
-    deleteEffect(effectIndex){
-        if( effectIndex >= 0 && effectIndex < this.effects.length ){
-            let selectedEffect = this.currentEffectIndex;
-            this.effects.splice(effectIndex,1);
-            if(selectedEffect>=effectIndex)
-                this.currentEffect = this.effects[--selectedEffect];
-        }
+    hasEffect(effectId){
+        return ( effectId in this.effects );
+    }
 
+    deleteEffect(effectId){
+        if(effectId==offEffectId){
+            return;
+        }
+        if( effectId in this.effects ){
+            
+            let indexOfEffect = Object.keys(this.effects).indexOf(effectId);   
+            delete this.effects[effectId];
+            let keys = Object.keys(this.effects); 
+            if(this.currentEffectId===effectId){
+                this.currentEffectId = keys[Math.min(indexOfEffect,keys.length)];
+            }
+        }
     }
 
     getData(){
+        let effects = {};
+        Object.entries(this.effects).forEach(([effectKey,effect])=>{
+            effects[effectKey] = effect.toJson();
+        });
+        
         return {
-            effectIndex:this.currentEffectIndex,
-            effects:this.effects.map((effect)=>effect.toJson())
+            effectIndex:this.currentEffectId,
+            effects
         }
     }
 
-    setData(settings){      
-        if(settings.effects) this.effects = settings.effects.map((data)=>new Pattern(this.settings).fromJson(data)).filter((e)=>!!e);
-        if(!this.effects || !this.effects.length){
-          console.log("no effects found. Creating defaults");
-          const offEffect = new Pattern(this.settings,"off","Plain");
-        
-          this.effects = [
-            offEffect,
-            new Pattern(this.settings,"white","Plain",new Color(0,0,0,1))
-          ];
+    setData(settings){   
+        let serializedEffectsType = typeof(settings.effects);
+        if(Array.isArray( settings.effects ))
+            serializedEffectsType = 'array';
+        this.effects = {};
+        if(serializedEffectsType==='array'){
+            
+            const effectsArr = settings.effects.map((data)=>new Pattern(this.settings).fromJson(data)).filter((e)=>!!e);
+            
+            effectsArr.forEach((e,i)=>{
+                this.effects[i==0?offEffectId:uid()] = e;                
+            });
         }
-        this.selectEffect( settings.effectIndex );
+        else if(serializedEffectsType==='object'){
+            Object.keys( settings.effects ).forEach((k,i)=>{
+                this.effects[k] = new Pattern(settings).fromJson( settings.effects[k] );
+            });
+        }
+
+        if(Object.keys(this.effects).length===0){
+          console.log("no effects found. Creating defaults");
+          const offEffect = new Pattern(settings,"off","Plain");
+        
+          this.effects = {};
+          this.effects[offEffectId] = offEffect;
+          this.effects[uid()] = new Pattern(settings,"white","Plain",new Color(0,0,0,1))
+        }
+        let selectedEffectId = (settings.effectId in this.effects) ? settings.effectId : offEffectId;
+        this.selectEffect( selectedEffectId );
 
     }
 
@@ -130,17 +171,4 @@ module.exports = class {
         this.settings.save(this.getData());
     }
 
-        /*
-    createEffectFromConfig(c){
-        let effect = new effectTypes[c.class];
-        effect.setConfig(c);
-        return effect;
-    }
-
-    getEffectConfig(e){
-        let config = e.getConfig();
-        config.class = e.class;
-        return config;
-    }
-    */
 }
