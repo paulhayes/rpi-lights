@@ -16,7 +16,8 @@ module.exports = class {
             label,
             type,
             min,
-            max
+            max,
+            step:1
         });
     }
 

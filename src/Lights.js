@@ -20,7 +20,7 @@ module.exports = class {
 
         const channel = channels[0];
         this.pixelData = channel.array;
-
+        this.lastTime = Date.now();
         this.effectStack = [];
         
         // ---- trap the SIGINT and reset before exit

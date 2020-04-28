@@ -21,8 +21,6 @@ const Settings = require('./Settings');
 const settings = new Settings(settingsPath);
 const Lights = require('./Lights');
 const LightingServer = require('./LightServer');
-
-
       
 /*
 var effects = [

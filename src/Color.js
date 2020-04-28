@@ -100,6 +100,21 @@ const Color = module.exports = class {
     return `#${toByte(this.r)}${toByte(this.g)}${toByte(this.b)}`;
   }
 
+  static fromHex(str){
+	if(typeof(str)!=='string'){
+		return new Color(0,0,0,0);
+	}
+	str = str.replace('#','');
+	if(!(str.length==6 || str.length==8)){
+		throw new Error('invalid hex string');
+	}
+	const r = parseInt( str.slice(0,2), 16 ) / 255;
+	const g = parseInt( str.slice(2,4), 16 ) / 255;
+	const b = parseInt( str.slice(4,6), 16 ) / 255;
+	const w = ( str.length > 6 ) ? parseInt( str.slice(6,8), 16 ) / 255 : 0;
+	return new Color(r,g,b,w);
+  }
+
 	static fromString(str){
 		if(!str){
 			return new Color();

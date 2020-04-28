@@ -5,7 +5,7 @@ const Wave = require('./effects/wave');
 const Chase = require('./effects/chase');
 const Fire = require('./effects/fire');
 const Custom = require('./effects/custom');
-
+const Disco = require('./effects/disco');
 const Gamma = require('./effects/gamma-test');
 
 module.exports = class {
@@ -16,7 +16,8 @@ module.exports = class {
             Plain,
             Wave,
             Chase,
-            Fire
+            Fire,
+            Disco
         }
 
         effectType = effectType || "Plain";
