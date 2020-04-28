@@ -19,6 +19,7 @@ module.exports = class {
           let effectId = lights.currentEffectId;
           let effects = {};
           Object.keys(lights.effects).forEach(k=>{effects[k]=lights.effects[k].name});
+          
           res.json( { effects, selected:effectId } );
         });
         

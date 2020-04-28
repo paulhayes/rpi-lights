@@ -73,7 +73,6 @@ async function main(){
       lights.selectLast();
     }
     else {
-      lights.storeLast();
       lights.selectOff();
     }
   }

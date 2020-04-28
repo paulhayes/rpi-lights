@@ -80,13 +80,13 @@ module.exports = class {
     }
 
     storeLast(){
-        if(this.currentEffect!==this.offEffect)
-            this.lastEffect = this.currentEffect;
+        if(this.currentEffectId!==offEffectId)
+            this.lastEffectId = this.currentEffectId;
     }
     
     selectLast(){
-        if(this.lastEffect!==null)
-            this.currentEffectId = this.lastEffect;
+        if(this.lastEffectId!==null)
+            this.selectEffect( this.lastEffectId );
     }
 
     selectEffect(effectId){
