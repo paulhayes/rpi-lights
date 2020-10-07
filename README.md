@@ -59,11 +59,25 @@ The mDns service should then find the lights by searching ```_lights._tcp.local`
 ### Config
 
 ### Startup on Boot
+
+#### Option 1 rc.local
+
 Add the following line before ```exit(0)``` in ```/etc/rc.local```
 
 ```bash
 node /home/lights/workspace/rpi-lights/lights.js < /dev/null &
 ```
+
+#### Option 2
+
+Install and configure pm2
+
+```bash
+npm install -g pm2
+pm2 start /home/lights/workspace/rpi-lights/lights.js
+pm2 save
+```
+
 
 ### Make read only
 - Use the following instructions https://github.com/ways/rpi-readonly
